@@ -1,3 +1,12 @@
+// ================= PWA: installeren op het toestel =================
+let PWA_PROMPT=null;
+const isStandalone=()=>(typeof window!=='undefined')&&(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true);
+const isIOS=()=>typeof navigator!=='undefined'&&/iphone|ipad|ipod/i.test(navigator.userAgent||'')&&!window.MSStream;
+if(typeof window!=='undefined'){
+  window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();PWA_PROMPT=e;if(location.hash==='#account')route()});
+  window.addEventListener('appinstalled',()=>{PWA_PROMPT=null;toast('App geïnstalleerd op dit toestel');if(location.hash==='#account')route()});
+}
+
 // ================= START =================
 function boot(){
   applyPref();buildNav();

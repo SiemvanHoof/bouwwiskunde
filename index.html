@@ -5969,6 +5969,15 @@ function setupCalc(){
   drawSci();drawTape();
 }
 
+// ================= PWA: installeren op het toestel =================
+let PWA_PROMPT=null;
+const isStandalone=()=>(typeof window!=='undefined')&&(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true);
+const isIOS=()=>typeof navigator!=='undefined'&&/iphone|ipad|ipod/i.test(navigator.userAgent||'')&&!window.MSStream;
+if(typeof window!=='undefined'){
+  window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();PWA_PROMPT=e;if(location.hash==='#account')route()});
+  window.addEventListener('appinstalled',()=>{PWA_PROMPT=null;toast('App geïnstalleerd op dit toestel');if(location.hash==='#account')route()});
+}
+
 // ================= START =================
 function boot(){
   applyPref();buildNav();
@@ -6061,20 +6070,35 @@ function setCloud(st){CLOUD.st=st;renderAcctChip();if(location.hash==='#account'
 function renderAcctChip(){const el=$('#acctChip');if(!el)return;const ok=CLOUD.st==='ok'||CLOUD.st==='pending'||CLOUD.st==='saving';
   el.innerHTML=`<a href="#account" class="acct${location.hash==='#account'?' on':''}">${CLOUD.avatar?`<img src="${esc(CLOUD.avatar)}" alt="" class="acct-av" referrerpolicy="no-referrer">`:`<span class="acct-av ph">${esc((CLOUD.name||'?')[0].toUpperCase())}</span>`}<span class="acct-t"><b></b><span class="acct-s ${ok?'ok':CLOUD.st==='error'?'err':''}"><i></i>${CLOUD_TXT[CLOUD.st]||''}</span></span></a>`;
   $('b',el).textContent=CLOUD.uid?(CLOUD.name||'Mijn profiel'):'Inloggen'}
+function pwaInstallHtml(){
+  if(isStandalone())return `<p class="okline">${ICON.check} Je gebruikt de app al geïnstalleerd op dit toestel.</p>`;
+  if(PWA_PROMPT)return `<p>Zet de app als icoon op je scherm: werkt daarna ook offline en voelt als een echte app.</p><div class="lk-acts" style="justify-content:flex-start"><button class="btn primary" id="pwaInstallBtn">Installeer app</button></div>`;
+  if(isIOS())return `<p>Op de iPhone/iPad kan dat niet met één knop, maar wel zo:</p><ol class="steps plain"><li>Open deze site in <b>Safari</b> (niet in Chrome/Instagram).</li><li>Tik op het deelicoon <span aria-hidden="true">⎋</span> onderin.</li><li>Kies <b>Zet op beginscherm</b>.</li></ol>`;
+  return `<p>Open deze site in Chrome of Edge en kies in het browsermenu <b>App installeren</b> of <b>Zet op beginscherm</b>.</p>`;
+}
+function bindPwaInstall(){
+  const b=$('#pwaInstallBtn');if(!b)return;
+  b.onclick=async()=>{if(!PWA_PROMPT)return;PWA_PROMPT.prompt();await PWA_PROMPT.userChoice;PWA_PROMPT=null;if(location.hash==='#account')route()};
+}
 function viewAccount(el){
   const st=DB.total?`${N(DB.total)} opgaven gemaakt · ${MODS.filter(m=>modDone(m.id)).length} van ${MODS.length} hoofdstukken af · ${(DB.days||[]).length} dag${(DB.days||[]).length===1?'':'en'} geoefend`:'Nog niets gemaakt.';
   el.innerHTML=`<header class="page-head"><p class="eyebrow">Account</p><h1>Mijn profiel</h1><p class="lede">${st}</p></header>
   <div id="acctState">${acctStateHtml()}</div>
-  <section><div class="sec-head"><h2>Op je telefoon gebruiken</h2></div><ol class="steps plain"><li>Open deze website op je telefoon.</li><li>Log in met hetzelfde account; je voortgang wordt automatisch geladen.</li><li>Kies in Safari of Chrome <b>Zet op beginscherm</b>: dan staat de app als icoon tussen je apps.</li></ol></section>
+  <section><div class="sec-head"><h2>App installeren</h2></div>${pwaInstallHtml()}
+  <p class="muted small">Eenmaal geïnstalleerd werkt de app ook zonder internet en wordt hij vanzelf bijgewerkt zodra er een nieuwe versie online staat.</p></section>
   <section><div class="sec-head"><h2>Back-up</h2></div><p class="muted">Een back-up is een bestand met al je voortgang, als extra zekerheid.</p>
   <div class="lk-acts" style="justify-content:flex-start"><button class="btn ghost" id="bkDown">Back-up downloaden</button><label class="btn ghost" for="bkFile">Back-up terugzetten</label><input type="file" id="bkFile" accept="application/json,.json" hidden></div><p class="muted small" id="bkMsg"></p></section>`;
-  bindAcct();
+  bindAcct();bindPwaInstall();
   $('#bkDown').onclick=()=>{const data=JSON.stringify({app:'bouwwiskunde',v:1,ts:Date.now(),db:DB,pref:PREF},null,1);try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([data],{type:'application/json'}));a.download=`bouwwiskunde-backup-${today()}.json`;document.body.appendChild(a);a.click();a.remove()}catch(e){$('#bkMsg').textContent='Downloaden lukt hier niet.'}};
   $('#bkFile').onchange=e=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{try{const j=JSON.parse(rd.result);if(j.app!=='bouwwiskunde'||!j.db)throw 0;DB=Object.assign(freshDB(),j.db);if(CLOUD.uid)DB.owner=CLOUD.uid;if(j.pref){PREF=Object.assign(PREF,j.pref);savePref();applyPref()}saveDB();Object.keys(PS).forEach(k=>delete PS[k]);toast('Back-up teruggezet');route()}catch(err){$('#bkMsg').textContent='Dit is geen geldig back-upbestand.'}};rd.readAsText(f)};
 }
 
 </script>
 
-<script>if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(()=>{})</script>
+<script>if("serviceWorker" in navigator&&location.protocol==="https:"){
+  navigator.serviceWorker.register("sw.js").catch(()=>{});
+  let swRefreshed=false;
+  navigator.serviceWorker.addEventListener("controllerchange",()=>{if(swRefreshed)return;swRefreshed=true;location.reload()});
+}</script>
 </body>
 </html>

@@ -92,6 +92,10 @@ window.dispatchEvent(new Event('fb-ready'))}
 %%APP_JS%%
 </script>
 
-<script>if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(()=>{})</script>
+<script>if("serviceWorker" in navigator&&location.protocol==="https:"){
+  navigator.serviceWorker.register("sw.js").catch(()=>{});
+  let swRefreshed=false;
+  navigator.serviceWorker.addEventListener("controllerchange",()=>{if(swRefreshed)return;swRefreshed=true;location.reload()});
+}</script>
 </body>
 </html>

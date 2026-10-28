@@ -71,6 +71,33 @@ daarna toe aan een categorie in `content/subjects.js`; de volgorde daar
 bepaalt automatisch de code (bijv. `B-16`) en welke module eerst af moet
 zijn (`m.prev`).
 
+Nieuwe oefenvraag toevoegen aan een bestaand (reken-/formule-)hoofdstuk?
+Controleer EERST of het concept al elders bestaat — lees de volledige
+bestaande `gen*`-functie(s) van dat hoofdstuk (vaak dekt elk niveau 1/2/3
+al een ander vraagtype, niet alleen een moeilijkere variant) én grep
+breed op het onderwerp, want hetzelfde concept duikt soms in een heel
+ander vak op (zie `Bouwwiskunde Techstack en structuur` in Obsidian voor
+een lijst van ontdekte overlappen). Nieuwe generator: schrijf 'm in de
+bijpassende `data/*.js`, voeg de sub toe aan `subs:`/`theory:` van de
+module (via `add(id, sub, lesson)` in `modules-uitbreiding-1.js` voor
+basismodules, of direct in de array voor `modules-uitbreiding-2.js`-
+modules), voeg een `FC(...)`-kaart toe aan `FORMULAS[id]` in
+`formulekaarten.js`, en werk het bijbehorende `G{}`-leerdoel bij. Test
+daarna met een Node-fuzztest (zie sessiegeschiedenis): roep de nieuwe
+`gen(l)` honderden keren per niveau aan en controleer op exceptions,
+NaN/undefined antwoorden en (bij meerkeuze) dubbele opties.
+
+## PWA: installeerbare app
+
+De site is al een volwaardige PWA (`manifest.webmanifest` + `sw.js`,
+geregistreerd in `src/template.html`) — geen native app store nodig.
+`src/js/core/boot.js` vangt `beforeinstallprompt` op (`PWA_PROMPT`) en
+herkent standalone/iOS (`isStandalone()`, `isIOS()`); de installatie-UI
+staat op de Account-pagina (`pwaInstallHtml()`/`bindPwaInstall()` in
+`src/js/core/auth-firebase.js`). Updates gaan automatisch: de SW gebruikt
+network-first caching, en `src/template.html` herlaadt de pagina één keer
+stil zodra een nieuwe service worker het overneemt (`controllerchange`).
+
 ## Inlogpoort
 
 Als `firebase-config.js` een echte Firebase-config bevat, moet je inloggen
