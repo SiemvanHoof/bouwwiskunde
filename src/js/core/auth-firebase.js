@@ -21,10 +21,10 @@ function cloudInit(){
 }
 // ================= INLOGPOORT (verplicht inloggen voor je de app gebruikt) =================
 function gateLoadingHtml(){
-  return `<div class="gate-card"><div class="gate-brand"><span class="logo" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M4 19L19 4v15z"/></svg></span><h1>Bouwwiskunde</h1></div><p class="lede">Laden…</p></div>`;
+  return `<div class="gate-card"><div class="gate-brand"><span class="logo" aria-hidden="true"><svg viewBox="0 0 512 512" fill="currentColor"><rect x="156" y="130" width="64" height="252" rx="18"/><path fill-rule="evenodd" d="M156 130 h108 c54 0 92 34 92 82 c0 36 -20 60 -48 72 c34 10 58 36 58 76 c0 54 -42 90 -98 90 h-112 z M220 186 v86 h78 c28 0 44 -16 44 -42 c0 -26 -16 -44 -44 -44 z M220 328 v96 h86 c30 0 48 -18 48 -48 c0 -30 -18 -48 -48 -48 z"/></svg></span><h1>Bouwwiskunde</h1></div><p class="lede">Laden…</p></div>`;
 }
 function gateFormHtml(){
-  return `<div class="gate-card"><div class="gate-brand"><span class="logo" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M4 19L19 4v15z"/></svg></span><h1>Bouwwiskunde</h1></div>
+  return `<div class="gate-card"><div class="gate-brand"><span class="logo" aria-hidden="true"><svg viewBox="0 0 512 512" fill="currentColor"><rect x="156" y="130" width="64" height="252" rx="18"/><path fill-rule="evenodd" d="M156 130 h108 c54 0 92 34 92 82 c0 36 -20 60 -48 72 c34 10 58 36 58 76 c0 54 -42 90 -98 90 h-112 z M220 186 v86 h78 c28 0 44 -16 44 -42 c0 -26 -16 -44 -44 -44 z M220 328 v96 h86 c30 0 48 -18 48 -48 c0 -30 -18 -48 -48 -48 z"/></svg></span><h1>Bouwwiskunde</h1></div>
   <p class="lede">Log in of maak een account om te oefenen. Zo wordt je voortgang bewaard en kun je ook op een ander apparaat verdergaan.</p>
   <form id="gateForm" class="lg-form" autocomplete="on"><label>E-mailadres<input type="email" id="gateMail" autocomplete="email" required></label><label>Wachtwoord<input type="password" id="gatePass" autocomplete="current-password" minlength="6" required></label>
   <div class="lg-acts"><button class="btn primary" type="submit" data-act="in">Inloggen</button><button class="btn ghost" type="button" data-act="up">Account maken</button></div></form>

@@ -98,6 +98,21 @@ staat op de Account-pagina (`pwaInstallHtml()`/`bindPwaInstall()` in
 network-first caching, en `src/template.html` herlaadt de pagina één keer
 stil zodra een nieuwe service worker het overneemt (`controllerchange`).
 
+## Logo / merkkleur
+
+Het logo (een geometrische "B") en de merkkleur terracotta (`--brand:
+#A6522E`, tekst erop `--on-brand`) staan los van de instelbare UI-
+accentkleur (`--primary`, die de gebruiker kan wijzigen via Kleuren
+kiezen). Het logo gebruikt daarom altijd `var(--brand)`, nooit
+`var(--primary)`, zodat het merk niet verandert als iemand een andere
+accentkleur kiest. Bronbestanden: `icon.svg` (512×512, ook bron voor
+`icon-180/192/512.png` en de favicon), en dezelfde path-data inline in
+`src/template.html` (zijbalk) en `src/js/core/auth-firebase.js`
+(inlogscherm, 2×) — bij een logo-wijziging alle vier bijwerken. PNG's
+zijn gegenereerd met headless Chrome (`--headless --screenshot`), niet
+met een los SVG-rastertool; zie de sessiegeschiedenis voor het commando
+als dat weer nodig is.
+
 ## Inlogpoort
 
 Als `firebase-config.js` een echte Firebase-config bevat, moet je inloggen

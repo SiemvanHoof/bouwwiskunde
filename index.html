@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="description" content="Oefenapp om je voor te bereiden op HBO Bouwkunde: rekenen, wiskunde, natuurkunde, bouwfysica en bouwkundige begrippen.">
-<meta name="theme-color" content="#2347A0">
+<meta name="theme-color" content="#A6522E">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon-180.png">
@@ -39,6 +39,7 @@ window.dispatchEvent(new Event('fb-ready'))}
   --ink:#111318; --ink-2:#5B6170; --ink-3:#9097A4; --line:#E4E6EA; --line-2:#EEF0F3;
   --primary:#2347A0; --primary-ink:#1A3678; --primary-soft:#E9EEF8; --on-primary:#FFFFFF; --primary-2:#7D96CF;
   --accent:#F5A400; --accent-soft:#FFF4D6; --accent-ink:#8A5A00;
+  --brand:#A6522E; --on-brand:#F5EDE1;
   --good:#16A34A; --good-soft:#E3F6EA; --mid:#D97706; --mid-soft:#FDF1DC; --bad:#DC2626; --bad-soft:#FDE7E7; --info:#2563EB; --info-soft:#E6EEFE;
   --shadow:0 1px 2px rgba(17,19,24,.06);
   --shadow-lg:0 1px 2px rgba(17,19,24,.06),0 8px 24px rgba(17,19,24,.08);
@@ -97,7 +98,7 @@ svg{flex:none}
 .frame.no-side .side,.frame.no-rail .rail{display:none}
 .side{border-right:1px solid var(--line-2);display:flex;flex-direction:column;position:sticky;top:0;align-self:start;height:100vh;height:100dvh;padding:22px 14px 16px max(14px,env(safe-area-inset-left,0px));background:var(--surface-2)}
 .brand{display:flex;align-items:center;gap:10px;padding:0 8px 18px}
-.logo{width:30px;height:30px;border-radius:50%;background:var(--primary);display:grid;place-items:center;color:var(--on-primary)}
+.logo{width:30px;height:30px;border-radius:50%;background:var(--brand);display:grid;place-items:center;color:var(--on-brand)}
 .logo svg{width:16px;height:16px}
 .brand-n{font:600 1rem/1.1 var(--f-display);letter-spacing:-.01em;flex:1}
 .menu-btn{display:none}
@@ -887,7 +888,7 @@ blockquote.defq{margin:8px 0;padding:10px 14px;border-left:3px solid var(--accen
 .lg-google{display:inline-flex;align-items:center;gap:10px;justify-self:start}#lgMsg{min-height:1.2em;color:var(--ink-2);margin:0}
 .authgate{min-height:100vh;min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:24px 16px;background:var(--bg)}
 .gate-card{width:100%;max-width:420px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:28px 24px;display:grid;gap:16px}
-.gate-brand{display:flex;align-items:center;gap:10px}.gate-brand .logo{color:var(--primary);flex:none;width:28px;height:28px}
+.gate-brand{display:flex;align-items:center;gap:10px}.gate-brand .logo{background:none;border-radius:0;color:var(--brand);flex:none;width:28px;height:28px}
 .gate-brand .logo svg{width:100%;height:100%}.gate-brand h1{font-size:1.2rem;margin:0}
 .gate-card .lede,.gate-card .lg-form,.gate-card .lg-or{max-width:none}
 #gateMsg{min-height:1.2em;color:var(--ink-2);margin:0}
@@ -941,7 +942,7 @@ blockquote.defq{margin:8px 0;padding:10px 14px;border-left:3px solid var(--accen
 <div class="frame" id="frame">
   <aside class="side" aria-label="Navigatie">
     <div class="brand">
-      <span class="logo" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M4 19L19 4v15z"/></svg></span>
+      <span class="logo" aria-hidden="true"><svg viewBox="0 0 512 512" fill="currentColor"><rect x="156" y="130" width="64" height="252" rx="18"/><path fill-rule="evenodd" d="M156 130 h108 c54 0 92 34 92 82 c0 36 -20 60 -48 72 c34 10 58 36 58 76 c0 54 -42 90 -98 90 h-112 z M220 186 v86 h78 c28 0 44 -16 44 -42 c0 -26 -16 -44 -44 -44 z M220 328 v96 h86 c30 0 48 -18 48 -48 c0 -30 -18 -48 -48 -48 z"/></svg></span>
       <span class="brand-n">Bouwwiskunde<small>startblok HBO Bouwkunde</small></span>
       <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="navlist"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M2 4h12M2 8h12M2 12h12"/></svg>Menu</button>
     </div>
@@ -6015,10 +6016,10 @@ function cloudInit(){
 }
 // ================= INLOGPOORT (verplicht inloggen voor je de app gebruikt) =================
 function gateLoadingHtml(){
-  return `<div class="gate-card"><div class="gate-brand"><span class="logo" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M4 19L19 4v15z"/></svg></span><h1>Bouwwiskunde</h1></div><p class="lede">Laden…</p></div>`;
+  return `<div class="gate-card"><div class="gate-brand"><span class="logo" aria-hidden="true"><svg viewBox="0 0 512 512" fill="currentColor"><rect x="156" y="130" width="64" height="252" rx="18"/><path fill-rule="evenodd" d="M156 130 h108 c54 0 92 34 92 82 c0 36 -20 60 -48 72 c34 10 58 36 58 76 c0 54 -42 90 -98 90 h-112 z M220 186 v86 h78 c28 0 44 -16 44 -42 c0 -26 -16 -44 -44 -44 z M220 328 v96 h86 c30 0 48 -18 48 -48 c0 -30 -18 -48 -48 -48 z"/></svg></span><h1>Bouwwiskunde</h1></div><p class="lede">Laden…</p></div>`;
 }
 function gateFormHtml(){
-  return `<div class="gate-card"><div class="gate-brand"><span class="logo" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M4 19L19 4v15z"/></svg></span><h1>Bouwwiskunde</h1></div>
+  return `<div class="gate-card"><div class="gate-brand"><span class="logo" aria-hidden="true"><svg viewBox="0 0 512 512" fill="currentColor"><rect x="156" y="130" width="64" height="252" rx="18"/><path fill-rule="evenodd" d="M156 130 h108 c54 0 92 34 92 82 c0 36 -20 60 -48 72 c34 10 58 36 58 76 c0 54 -42 90 -98 90 h-112 z M220 186 v86 h78 c28 0 44 -16 44 -42 c0 -26 -16 -44 -44 -44 z M220 328 v96 h86 c30 0 48 -18 48 -48 c0 -30 -18 -48 -48 -48 z"/></svg></span><h1>Bouwwiskunde</h1></div>
   <p class="lede">Log in of maak een account om te oefenen. Zo wordt je voortgang bewaard en kun je ook op een ander apparaat verdergaan.</p>
   <form id="gateForm" class="lg-form" autocomplete="on"><label>E-mailadres<input type="email" id="gateMail" autocomplete="email" required></label><label>Wachtwoord<input type="password" id="gatePass" autocomplete="current-password" minlength="6" required></label>
   <div class="lg-acts"><button class="btn primary" type="submit" data-act="in">Inloggen</button><button class="btn ghost" type="button" data-act="up">Account maken</button></div></form>
