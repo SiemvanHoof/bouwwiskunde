@@ -34,6 +34,7 @@
   "pages/begrippen.js",
   "pages/praktijkopdrachten.js",
   "pages/fouten.js",
+  "pages/statistieken.js",
   "pages/formuleblad.js",
   "pages/toetsen.js",
   "pages/rekenmachine.js",

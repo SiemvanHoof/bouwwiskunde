@@ -15,13 +15,14 @@ function buildNav(){
   <a href="#instaptoets" data-r="instaptoets" class="navi"><span class="nv-ic">${ICON.star}</span><span class="nv-name">Instaptoets</span></a>
   <a href="#oefentoets" data-r="oefentoets" class="navi"><span class="nv-ic">${ICON.clock}</span><span class="nv-name">Oefentoets</span></a>
   <div class="navlabel">Naslag</div>
+  <a href="#statistieken" data-r="statistieken" class="navi"><span class="nv-ic">${ICON.chart}</span><span class="nv-name">Statistieken</span></a>
   <a href="#formules" data-r="formules" class="navi"><span class="nv-ic">${ICON.fx}</span><span class="nv-name">Formuleblad</span></a>
   <a href="#begrippen" data-r="begrippen" class="navi"><span class="nv-ic">${ICON.doc}</span><span class="nv-name">Begrippenlijst</span></a>
   <a href="#fouten" data-r="fouten" class="navi"><span class="nv-ic">${ICON.x}</span><span class="nv-name">Fouten</span><span class="nv-count">${DB.errors.length||''}</span></a>
   <a href="#methode" data-r="methode" class="navi"><span class="nv-ic">${ICON.doc}</span><span class="nv-name">Zo leer je hier</span></a>`;
   $$('.nc-h').forEach(b=>b.onclick=()=>{const g=b.closest('.ncat');const o=!g.classList.contains('open');g.classList.toggle('open',o);b.setAttribute('aria-expanded',o);PREF.groups[b.dataset.c]=o;savePref()});
   $$('.ng-h').forEach(b=>b.onclick=()=>{const g=b.closest('.ngroup');const o=!g.classList.contains('open');g.classList.toggle('open',o);b.setAttribute('aria-expanded',o);PREF.groups[b.dataset.g]=o;savePref()});
-  const key=sm?sm[1]:(MOD[h]||['herhalen','instaptoets','oefentoets','fouten','formules','begrippen','methode','account'].includes(h))?h:'start';
+  const key=sm?sm[1]:(MOD[h]||['herhalen','instaptoets','oefentoets','fouten','formules','begrippen','methode','statistieken','account'].includes(h))?h:'start';
   $$('.navi').forEach(a=>a.classList.toggle('active',a.dataset.r===key));
 }
 function refreshNav(){
@@ -47,6 +48,7 @@ function route(){
   else if(h==='formules'){setCrumbs([['Naslag','#start'],['Formuleblad']]);viewFormulas(main)}
   else if(h==='account'){setCrumbs([['Account','#account'],['Mijn profiel']]);viewAccount(main)}
   else if(h==='begrippen'){setCrumbs([['Naslag','#start'],['Begrippenlijst']]);viewTerms(main)}
+  else if(h==='statistieken'){setCrumbs([['Naslag','#start'],['Statistieken']]);viewStats(main)}
   else{setCrumbs([['Bouwwiskunde','#start'],['Home']]);viewHome(main)}
   buildNav();renderAcctChip();window.scrollTo(0,0);
 }

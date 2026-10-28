@@ -28,7 +28,7 @@ function viewHome(el){
     <div class="vk-cats">${S.cats.map(C=>{const cp=Math.round(C.mods.reduce((a,id)=>a+mastery(id),0)/C.mods.length);return `<div class="vk-cat"><span>${C.name}</span>${tape(cp)}</div>`}).join('')}</div>
     <div class="vk-next">${nx?`Volgende: <b>${nx.code} ${nx.name}</b>`:'Alles afgerond'} ${ICON.arrow}</div></a>`}).join('')}</div></section>
   <div class="home-2">
-  <section><div class="sec-head"><h2>Laatste 14 dagen</h2><span class="muted small"><i class="lg-dot ok"></i>in één keer goed <i class="lg-dot all"></i>gemaakt</span></div>${activityChart()}</section>
+  <section><div class="sec-head"><h2>Laatste 14 dagen</h2><span class="muted small"><i class="lg-dot ok"></i>in één keer goed <i class="lg-dot all"></i>gemaakt</span></div><a class="stats-link" href="#statistieken" aria-label="Bekijk alle statistieken">${activityChart()}</a></section>
   <section><div class="sec-head"><h2>Laatst gemaakt</h2></div>
   ${(DB.log||[]).filter(e=>e.kind==='ans').length?`<ul class="actlist">${(DB.log||[]).filter(e=>e.kind==='ans').slice(0,6).map(e=>`<li><span class="mark ${e.ok?'ok':'no'}">${e.ok?ICON.check:ICON.x}</span><span>${esc(e.txt)}</span><span class="muted small">${ago(e.ts)}</span></li>`).join('')}</ul>`:'<p class="muted">Nog niets gemaakt. Begin bij “Verder oefenen” hierboven.</p>'}</section></div>
   <section><div class="sec-head"><h2>Snel naar</h2></div><div class="quick">
