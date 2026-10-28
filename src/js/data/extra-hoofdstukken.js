@@ -121,6 +121,73 @@ function genRendement(l){
   if(l<3){const I=R(150,600)*1000,H=Math.round(I*pick([0.045,0.05,0.055,0.06,0.07])/100)*100;return {q:`Een appartement kost <b>€ ${N(I)}</b> en levert <b>€ ${N(H)}</b> huur per jaar op. Wat is het bruto aanvangsrendement (BAR)? (2 decimalen)`,type:'num',answer:H/I*100,dec:2,unit:'%',hint:'BAR = jaarhuur / investering × 100%',sol:steps([`${N(H)} / ${N(I)} × 100% = ${N(H/I*100,3)}%`])}}
   const I=R(4,30)*1000,B=R(400,2400);return {q:`Zonnepanelen kosten <b>€ ${N(I)}</b> en besparen <b>€ ${N(B)}</b> per jaar. Wat is de eenvoudige terugverdientijd? (1 decimaal)`,type:'num',answer:I/B,dec:1,unit:'jaar',hint:'Investering / jaarlijkse besparing.',sol:steps([`${N(I)} / ${N(B)} = ${N(I/B,2)} jaar`,'Eenvoudig: zonder rente en prijsstijgingen.'])};
 }
+// ---- extra oefenvragen: schatten, explog, warmte, sterkte, statistiek, calculatie, afgeleide ----
+function genSchatDeel(l){
+  if(l===1){const rb=pick([15,20,25,30,40,50]),q=R(8,40),a=rb*q+pick([-4,-3,-2,-1,1,2,3,4]);const right=N(q*rb);
+    return {q:`Schat zonder rekenmachine:<div class="expr">${a} ÷ ${rb} ≈ ?</div>`,...mc(right,[N(q*rb*10),N(Math.round(q*rb/10)),N((q+5)*rb)]),hint:'Rond het deeltal af tot een rond veelvoud van de deler.',sol:steps([`${a} ≈ ${N(q*rb)} (= ${q} × ${rb})`,`${N(q*rb)} ÷ ${rb} = ${q}`,`Dus ${a} ÷ ${rb} ≈ ${q}`]),calc:false}}
+  const plaat=pick([0.36,0.45,0.54,0.72,0.9]),wand=rnd(R(80,280)/10,1)*rnd(R(20,35)/10,1);const n=Math.round(wand/plaat);
+  return {q:`Een wand van ongeveer <b>${N(Math.round(wand))} m²</b> wordt betegeld met tegels van <b>${N(plaat)} m²</b> per stuk. Welk aantal tegels is een realistische schatting?`,...mc(N(n),[N(Math.round(n/10)),N(n*10),N(Math.round(n*2.2))]),hint:'Rond het wandoppervlak en de plaatmaat af en deel.',sol:steps([`${N(Math.round(wand))} m² ÷ ${N(plaat)} m² per tegel ≈ ${n} tegels`,'Voor een echte bestelling tel je er nog verlies en snijwerk bij op.']),calc:false};
+}
+function genSchatControle(l){
+  const cases=[
+    ()=>{const L=rnd(R(30,80)/10,1),B=rnd(R(25,60)/10,1);const right=L*B;return {ctx:`Een kamer van ${N(L)} × ${N(B)} m.`,calc:`${N(L)} × ${N(B)} m²`,right};},
+    ()=>{const b=pick([50,75,100,150,200]),h=pick([150,200,250,300]);const right=b*h*h/6;return {ctx:`Het weerstandsmoment van een balk ${b}×${h} mm.`,calc:`W = ${b} × ${h}² / 6, in mm³`,right};},
+    ()=>{const kg=R(300,3000);const right=kg*10/1000;return {ctx:`De zwaartekracht op een massa van ${kg} kg (g ≈ 10 N/kg).`,calc:`F = m × g, in kN`,right};}
+  ];
+  const c=pick(cases)();const f=pick([1,1,10,0.1,100]);const shown=Math.round(c.right*f*1000)/1000;const ratio=shown/c.right;
+  let verdict,opts;
+  if(Math.abs(ratio-1)<0.05){verdict='Ja, dat klopt ongeveer';opts=['Nee, ongeveer een factor 10 te groot','Nee, ongeveer een factor 10 te klein','Nee, ongeveer een factor 100 te groot']}
+  else if(Math.abs(ratio-10)<0.5){verdict='Nee, ongeveer een factor 10 te groot';opts=['Ja, dat klopt ongeveer','Nee, ongeveer een factor 10 te klein','Nee, ongeveer een factor 100 te groot']}
+  else if(Math.abs(ratio-0.1)<0.01){verdict='Nee, ongeveer een factor 10 te klein';opts=['Ja, dat klopt ongeveer','Nee, ongeveer een factor 10 te groot','Nee, ongeveer een factor 100 te klein']}
+  else {verdict='Nee, ongeveer een factor 100 te groot';opts=['Ja, dat klopt ongeveer','Nee, ongeveer een factor 10 te groot','Nee, ongeveer een factor 10 te klein']}
+  return {q:`${c.ctx} Berekening: <b>${c.calc}</b>. Een rekenmachine (of iemand anders) geeft als antwoord <b>${N(shown)}</b>. Klopt dat ongeveer?`,...mc(verdict,opts),hint:'Schat de berekening zelf eerst grof en vergelijk met het gegeven antwoord.',sol:steps([`Eigen schatting: ongeveer ${N(c.right,2)}`,`Gegeven antwoord: ${N(shown)}`,verdict])};
+}
+function genDecibel(l){
+  if(l===1){const n=pick([1,2,3]);const ratio=10**n,L=10*n;
+    return {q:`Een geluidsbron is <b>${N(ratio)}</b> keer zo intensief als een referentiebron. Hoeveel decibel is dat? (L = 10 · log(I/I₀))`,type:'num',answer:L,unit:'dB',hint:'log van een macht van 10 is gewoon de exponent.',sol:steps([`L = 10 · log(${N(ratio)}) = 10 × ${n} = ${L} dB`]),calc:false}}
+  if(l===2){const n=pick([1,2,3,4]),L=10*n;
+    return {q:`Het geluidsniveau is <b>${L} dB</b> hoger dan een referentiebron. Hoeveel keer zo groot is de geluidsintensiteit dan?`,type:'num',answer:10**n,unit:'×',hint:'Werk L = 10 · log(I/I₀) om: I/I₀ = 10^(L/10).',sol:steps([`I/I₀ = 10^(${L}/10) = 10${sup(n)} = ${N(10**n)}`])}}
+  const L1=pick([60,65,70,75,80]),L2=L1+pick([0,3,6,10]);const Ltot=10*Math.log10(10**(L1/10)+10**(L2/10));
+  return {q:`Twee machines maken samen lawaai: de ene <b>${L1} dB</b>, de andere <b>${L2} dB</b> (ieder apart gemeten). Hoeveel dB is het samen, als je de intensiteiten optelt? (1 decimaal)`,type:'num',answer:Ltot,dec:1,unit:'dB',hint:'Decibellen tel je niet rechtstreeks op: reken eerst terug naar intensiteiten, tel die op en reken terug naar dB.',sol:steps([`I₁/I₀ = 10^(${L1}/10), I₂/I₀ = 10^(${L2}/10)`,`L = 10 · log(10^(${L1}/10) + 10^(${L2}/10)) = ${N(Ltot,2)} dB`,`Let op: nooit zomaar optellen — ${L1} + ${L2} = ${L1+L2} dB is fout.`])};
+}
+function genWarmteMeng(l){
+  if(l<3){const m1=R(2,8),T1=R(60,90),m2=R(2,8),T2=R(5,20);const Tm=(m1*T1+m2*T2)/(m1+m2);
+    return {q:`Je mengt <b>${m1} L water</b> van <b>${T1} °C</b> met <b>${m2} L water</b> van <b>${T2} °C</b>. Welke temperatuur krijgt het mengsel? (verlies naar de omgeving verwaarloosd, 1 decimaal)`,type:'num',answer:Tm,dec:1,unit:'°C',hint:'De warmte die het warme water afgeeft, neemt het koude water op: m₁(T₁ − T_m) = m₂(T_m − T₂).',sol:steps(['T_m = (m₁T₁ + m₂T₂) / (m₁ + m₂)',`T_m = (${m1}×${T1} + ${m2}×${T2}) / (${m1}+${m2}) = ${N(Tm,2)} °C`])}}
+  const m1=R(3,10),T1=R(55,85),mat=pick([['beton',880,R(200,600)],['staal',460,R(80,250)]]);const [naam,c2,m2]=mat,T2=R(10,20);
+  const Tm=(m1*4180*T1+m2*c2*T2)/(m1*4180+m2*c2);
+  return {q:`<b>${m1} L</b> warm water van <b>${T1} °C</b> (c = 4180 J/(kg·K)) komt in contact met <b>${m2} kg ${naam}</b> van <b>${T2} °C</b> (c = ${c2} J/(kg·K)). Welke temperatuur ontstaat in evenwicht? (verlies verwaarloosd, 1 decimaal)`,type:'num',answer:Tm,dec:1,unit:'°C',hint:'De afgegeven warmte van het water is gelijk aan de opgenomen warmte van het materiaal: m₁c₁(T₁ − T_m) = m₂c₂(T_m − T₂).',sol:steps(['T_m = (m₁c₁T₁ + m₂c₂T₂) / (m₁c₁ + m₂c₂)',`T_m = (${m1}×4180×${T1} + ${m2}×${c2}×${T2}) / (${m1}×4180 + ${m2}×${c2}) = ${N(Tm,2)} °C`])};
+}
+function genSterkteSchaal(l){
+  if(l<3){const f=pick([1.25,1.5,2,2.5,3]);const Wf=f*f,If=f*f*f;
+    if(l===1)return {q:`Een balk wordt bij gelijke breedte <b>${N(f)}×</b> zo hoog gemaakt. Hoeveel keer zo groot wordt het weerstandsmoment W (en dus de sterkte)? (2 decimalen)`,type:'num',answer:Wf,dec:2,unit:'×',hint:'W = b·h²/6: bij gelijke b is W evenredig met h².',sol:steps(['W is evenredig met h²',`${N(f)}² = ${N(Wf,2)}×`])};
+    return {q:`Een balk wordt bij gelijke breedte <b>${N(f)}×</b> zo hoog gemaakt. Hoeveel keer zo groot wordt het traagheidsmoment I (en dus de stijfheid)? (2 decimalen)`,type:'num',answer:If,dec:2,unit:'×',hint:'I = b·h³/12: bij gelijke b is I evenredig met h³.',sol:steps(['I is evenredig met h³',`${N(f)}³ = ${N(If,2)}×`])}}
+  const b1=pick([75,100,150]),h1=pick([200,250,300]),b2=pick([75,100,150,200].filter(x=>x!==b1)),h2=pick([150,200,250,300].filter(x=>x!==h1));
+  const W1=b1*h1*h1/6,W2=b2*h2*h2/6,ratio=W2/W1;
+  return {q:`Doorsnede A is <b>${b1}×${h1} mm</b>, doorsnede B is <b>${b2}×${h2} mm</b> (b×h). Hoeveel keer zo groot is het weerstandsmoment van B ten opzichte van A? (2 decimalen)`,type:'num',answer:ratio,dec:2,unit:'×',hint:'Bereken W = b·h²/6 voor beide en deel ze door elkaar.',sol:steps([`W_A = ${b1}×${h1}²/6 = ${N(W1,0)} mm³`,`W_B = ${b2}×${h2}²/6 = ${N(W2,0)} mm³`,`W_B / W_A = ${N(ratio,3)}`])};
+}
+function genVariatiecoeff(l){
+  if(l<3){const m=R(25,45),s=rnd(R(15,45)/10,1);const cv=s/m*100;
+    return {q:`Een materiaal heeft een gemiddelde sterkte van <b>${m} N/mm²</b> met een standaardafwijking van <b>${N(s)} N/mm²</b>. Wat is de variatiecoëfficiënt (s / gemiddelde × 100%)? (1 decimaal)`,type:'num',answer:cv,dec:1,unit:'%',hint:'CV = s / x̄ × 100%',sol:steps([`CV = ${N(s)} / ${m} × 100% = ${N(cv,2)}%`])}}
+  const mA=R(30,45),sA=rnd(R(20,40)/10,1),mB=R(15,28),sB=rnd(R(15,30)/10,1);
+  const cvA=sA/mA*100,cvB=sB/mB*100,beter=cvA<cvB?'A':'B';
+  return {q:`Leverancier A: gemiddeld ${mA} N/mm², s = ${N(sA)}. Leverancier B: gemiddeld ${mB} N/mm², s = ${N(sB)}. De gemiddelden verschillen, dus de standaardafwijkingen alleen vergelijken is niet eerlijk. Welke leverancier heeft relatief de minste spreiding (de laagste variatiecoëfficiënt)?`,...mc(`Leverancier ${beter}`,[`Leverancier ${beter==='A'?'B':'A'}`,'Beide zijn precies even consistent','Dat kun je niet bepalen zonder de losse meetwaarden']),hint:'Bereken voor beide CV = s / x̄ × 100% en vergelijk.',sol:steps([`CV_A = ${N(sA)} / ${mA} × 100% = ${N(cvA,2)}%`,`CV_B = ${N(sB)} / ${mB} × 100% = ${N(cvB,2)}%`,`Leverancier ${beter} heeft de laagste (beste) variatiecoëfficiënt.`])};
+}
+function genBTWCalc(l){
+  if(l===1){const excl=rnd(R(200,8000)/10,1)*10;const incl=excl*1.21;
+    return {q:`Een post in de begroting is <b>€ ${N(excl,2)}</b> exclusief btw. Wat is het bedrag inclusief 21% btw? (2 decimalen)`,type:'num',answer:incl,dec:2,unit:'€',unitPre:true,hint:'Incl. = excl. × 1,21',sol:steps([`€ ${N(excl,2)} × 1,21 = € ${N(incl,2)}`])}}
+  if(l===2){const incl=rnd(R(300,12000)/10,1)*10;const excl=incl/1.21;
+    return {q:`Een factuur van een onderaannemer is <b>€ ${N(incl,2)}</b> inclusief 21% btw. Wat was het bedrag exclusief btw? (2 decimalen)`,type:'num',answer:excl,dec:2,unit:'€',unitPre:true,hint:'Excl. = incl. ÷ 1,21 (niet × 0,79!)',sol:steps([`€ ${N(incl,2)} ÷ 1,21 = € ${N(excl,2)}`])}}
+  const posts=Array.from({length:3},()=>rnd(R(500,4000)/10,1)*10);const som=posts.reduce((a,b)=>a+b,0);const incl=som*1.21;
+  return {q:`Een begroting heeft drie posten exclusief btw: <b>${posts.map(p=>'€ '+N(p,2)).join(', ')}</b>. Wat is het totaal inclusief 21% btw? (2 decimalen)`,type:'num',answer:incl,dec:2,unit:'€',unitPre:true,hint:'Tel eerst de posten op, reken daarna pas de btw erbij.',sol:steps([`Som excl.: ${posts.map(p=>N(p,2)).join(' + ')} = € ${N(som,2)}`,`× 1,21 = € ${N(incl,2)}`])};
+}
+function genAfgHelling(l){
+  if(l===1){const a=nz(-5,5),k=nz(-40,40);const x=k/(2*a);
+    return {q:`Gegeven <span class="formula">f(x) = ${polyStr([a,0,0])}</span>. Bij welke x is de helling van de grafiek gelijk aan <b>${k}</b>? (2 decimalen)`,type:'num',answer:x,dec:2,hint:'Stel f′(x) gelijk aan de gevraagde helling en los op naar x.',sol:steps([`f′(x) = ${2*a}x`,`${2*a}x = ${k}`,`x = ${N(x,3)}`]),calc:false}}
+  if(l===2){const a=nz(-4,4),b=nz(-8,8),c=R(-9,9),k=nz(-30,30);const x=(k-b)/(2*a);
+    return {q:`Gegeven <span class="formula">f(x) = ${polyStr([a,b,c])}</span>. Bij welke x is f′(x) = <b>${k}</b>? (2 decimalen)`,type:'num',answer:x,dec:2,hint:'Bepaal eerst f′(x), stel die gelijk aan k en los de lineaire vergelijking op.',sol:steps([`f′(x) = ${polyStr([2*a,b])}`,`${2*a}x ${b>=0?'+':'−'} ${Math.abs(b)} = ${k}`,`x = (${k} ${b>=0?'−':'+'} ${Math.abs(b)}) / ${2*a} = ${N(x,3)}`]),calc:false}}
+  const a=rnd(R(2,15)/10,1),b=R(5,25),v=R(20,120);const t=(v-b)/(2*a);
+  return {q:`De afgelegde weg is <span class="formula">s(t) = ${N(a)}·t² + ${b}·t</span> (t in s, s in m). Bij welke t is de snelheid v(t) = s′(t) gelijk aan <b>${v} m/s</b>? (2 decimalen)`,type:'num',answer:t,dec:2,unit:'s',hint:'v(t) = s′(t) = 2·a·t + b. Stel gelijk aan de gevraagde snelheid.',sol:steps([`v(t) = ${N(2*a,2)}t + ${b}`,`${N(2*a,2)}t + ${b} = ${v}`,`t = (${v} − ${b}) / ${N(2*a,2)} = ${N(t,3)} s`])};
+}
 
 const CASES3={
 statistiek:[()=>{const xs=Array.from({length:6},()=>R(30,44));const m=xs.reduce((a,b)=>a+b,0)/6;const s=Math.sqrt(xs.reduce((a,x)=>a+(x-m)**2,0)/5);const fk=m-1.64*s;const eis=pick([30,35]);
