@@ -1,0 +1,2 @@
+{"name":"Bouwwiskunde Startblok","short_name":"Bouwwiskunde","description":"Oefenapp voor de start van HBO Bouwkunde","lang":"nl","start_url":"./","scope":"./","display":"standalone","background_color":"#E7E8EB","theme_color":"#2347A0",
+"icons":[{"src":"icon-192.png","sizes":"192x192","type":"image/png"},{"src":"icon-512.png","sizes":"512x512","type":"image/png"},{"src":"icon-512.png","sizes":"512x512","type":"image/png","purpose":"maskable"},{"src":"icon.svg","sizes":"any","type":"image/svg+xml"}]}
