@@ -885,6 +885,12 @@ blockquote.defq{margin:8px 0;padding:10px 14px;border-left:3px solid var(--accen
 .lg-form input:focus{outline:2px solid var(--accent);outline-offset:1px}.lg-acts{display:flex;gap:8px;flex-wrap:wrap}
 .lg-or{display:flex;align-items:center;gap:10px;color:var(--ink-3);font-size:.8rem;max-width:420px}.lg-or::before,.lg-or::after{content:'';flex:1;border-top:1px solid var(--line)}
 .lg-google{display:inline-flex;align-items:center;gap:10px;justify-self:start}#lgMsg{min-height:1.2em;color:var(--ink-2);margin:0}
+.authgate{min-height:100vh;min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:24px 16px;background:var(--bg)}
+.gate-card{width:100%;max-width:420px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:28px 24px;display:grid;gap:16px}
+.gate-brand{display:flex;align-items:center;gap:10px}.gate-brand .logo{color:var(--primary);flex:none;width:28px;height:28px}
+.gate-brand .logo svg{width:100%;height:100%}.gate-brand h1{font-size:1.2rem;margin:0}
+.gate-card .lede,.gate-card .lg-form,.gate-card .lg-or{max-width:none}
+#gateMsg{min-height:1.2em;color:var(--ink-2);margin:0}
 .ncat{display:grid}
 .nc-h{display:grid;grid-template-columns:14px minmax(0,1fr) auto;align-items:center;gap:6px;width:100%;background:none;border:0;padding:7px 8px;border-radius:7px;cursor:pointer;color:var(--ink-2);font:600 .84rem/1.2 var(--f-body);text-align:left}
 .nc-h:hover{background:var(--sunk);color:var(--ink)}
@@ -897,6 +903,9 @@ blockquote.defq{margin:8px 0;padding:10px 14px;border-left:3px solid var(--accen
 .steps.plain{padding-left:1.3em;display:grid;gap:4px}
 </style>
 
+<div class="authgate" id="authGate" hidden></div>
+
+<div id="appShell">
 <div class="frame" id="frame">
   <aside class="side" aria-label="Navigatie">
     <div class="brand">
@@ -944,6 +953,7 @@ blockquote.defq{margin:8px 0;padding:10px 14px;border-left:3px solid var(--accen
 </div>
 <div id="toast" hidden role="status"></div>
 <div id="celebrate" hidden role="status"></div>
+</div>
 
 <script>
 // ================= HELPERS =================
@@ -5142,6 +5152,7 @@ function renderRail(){}
 function setCrumbs(parts){$('#crumbs').innerHTML=parts.map((p,i)=>i<parts.length-1?`<a href="${p[1]}">${p[0]}</a><span class="sep">/</span>`:`<span class="cur">${p[0]}</span>`).join('')}
 let timerH=null;function stopTimer(){clearInterval(timerH);timerH=null}
 function route(){
+  const ag=$('#authGate');if(ag&&!ag.hidden)return;
   const h=(location.hash||'').slice(1)||'start';document.body.classList.remove('nav-open');$('#menuBtn').setAttribute('aria-expanded','false');stopTimer();toggleTheme(false);
   const main=$('#main');const sm=/^([a-z]+)-(uitleg|formules|oefenen|praktijk)$/.exec(h);
   if(sm&&MOD[sm[1]]){const m=MOD[sm[1]];const tb=tabsFor(m).find(x=>x[0]===sm[2]);if(!tb){location.replace('#'+m.id);return}setCrumbs([[subjectOf(m.id).name,'#'+m.id],[catOf(m.id).name,'#'+m.id],[`${m.code} · ${m.name}`,`#${m.id}`],[tb[1]]]);viewModuleSub(main,m,sm[2])}
@@ -5611,7 +5622,7 @@ function boot(){
   $('#tsearch').addEventListener('submit',e=>{e.preventDefault();FSEARCH=$('#tsearchIn').value;FLVL=0;if(location.hash==='#formules')viewFormulas($('#main'));else location.hash='#formules';$('#tsearchIn').value=''});
   document.addEventListener('keydown',e=>{if(e.key==='/'&&!/input|textarea/i.test(document.activeElement.tagName)){e.preventDefault();$('#tsearchIn').focus()}});
   $('#resetBtn').onclick=e=>{const b=e.currentTarget;if(b.dataset.c){DB=freshDB();saveDB();Object.keys(PS).forEach(k=>delete PS[k]);buildNav();route();b.textContent='Voortgang wissen';delete b.dataset.c;toast('Voortgang gewist')}else{b.dataset.c=1;b.textContent='Klik nogmaals om alles te wissen';setTimeout(()=>{if(b.dataset.c){b.textContent='Voortgang wissen';delete b.dataset.c}},3500)}};
-  window.addEventListener('hashchange',route);setupCalc();route();cloudInit();
+  window.addEventListener('hashchange',route);setupCalc();cloudInit();
 }
 if(typeof document!=='undefined')boot();
 
@@ -5620,20 +5631,49 @@ CLOUD_TXT.loggedout='Niet ingelogd';CLOUD_TXT.noconfig='Online opslaan niet inge
 
 function cloudInit(){
   const start=()=>{
-    if(!window.FB){setCloud('noconfig');return}
+    if(!window.FB){setCloud('noconfig');updateGate();route();return}
     FB.onAuth(async u=>{
       if(u){
         if(DB.owner&&DB.owner!==u.uid){DB=freshDB();try{localStorage.setItem(KEY,JSON.stringify(DB))}catch(e){}}
         CLOUD.uid=u.uid;CLOUD.name=u.displayName||(u.email||'').split('@')[0];CLOUD.email=u.email||'';CLOUD.avatar=u.photoURL||'';CLOUD.err='';
         CLOUD.ref={get:async()=>{const s=await FB.get(u.uid);return {exists:s.exists(),data:()=>s.data()}},set:d=>FB.set(u.uid,d)};
-        CLOUD.ready=false;setCloud('connecting');await cloudSync(true);
+        CLOUD.ready=false;setCloud('connecting');updateGate();await cloudSync(true);
         if(DB.owner!==u.uid){DB.owner=u.uid;try{localStorage.setItem(KEY,JSON.stringify(DB))}catch(e){}}
-        if(location.hash==='#account')route();else{buildNav();if(!location.hash||location.hash==='#start')route()}
-      }else{CLOUD.uid=null;CLOUD.ref=null;CLOUD.name='';CLOUD.email='';CLOUD.avatar='';CLOUD.ready=false;setCloud('loggedout');if(location.hash==='#account')route()}
+        updateGate();route();
+      }else{CLOUD.uid=null;CLOUD.ref=null;CLOUD.name='';CLOUD.email='';CLOUD.avatar='';CLOUD.ready=false;setCloud('loggedout');updateGate()}
     });
     document.addEventListener('visibilitychange',()=>{if(!CLOUD.ref)return;if(document.visibilityState==='hidden'){clearTimeout(CLOUD.timer);cloudFlush()}else if(CLOUD.ready&&!CLOUD.dirty&&!CLOUD.busy)cloudSync(false)});
   };
+  updateGate();
   if('FB' in window)start();else window.addEventListener('fb-ready',start,{once:true});
+}
+// ================= INLOGPOORT (verplicht inloggen voor je de app gebruikt) =================
+function gateLoadingHtml(){
+  return `<div class="gate-card"><div class="gate-brand"><span class="logo" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M4 19L19 4v15z"/></svg></span><h1>Bouwwiskunde</h1></div><p class="lede">Laden…</p></div>`;
+}
+function gateFormHtml(){
+  return `<div class="gate-card"><div class="gate-brand"><span class="logo" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M4 19L19 4v15z"/></svg></span><h1>Bouwwiskunde</h1></div>
+  <p class="lede">Log in of maak een account om te oefenen. Zo wordt je voortgang bewaard en kun je ook op een ander apparaat verdergaan.</p>
+  <form id="gateForm" class="lg-form" autocomplete="on"><label>E-mailadres<input type="email" id="gateMail" autocomplete="email" required></label><label>Wachtwoord<input type="password" id="gatePass" autocomplete="current-password" minlength="6" required></label>
+  <div class="lg-acts"><button class="btn primary" type="submit" data-act="in">Inloggen</button><button class="btn ghost" type="button" data-act="up">Account maken</button></div></form>
+  <div class="lg-or"><span>of</span></div><button class="btn ghost lg-google" type="button" id="gateGoogle"><svg viewBox="0 0 18 18" width="18" height="18" aria-hidden="true"><path fill="#4285F4" d="M17.6 9.2c0-.6-.1-1.2-.2-1.7H9v3.3h4.8a4.1 4.1 0 0 1-1.8 2.7v2.2h2.9c1.7-1.6 2.7-3.9 2.7-6.5z"/><path fill="#34A853" d="M9 18c2.4 0 4.5-.8 6-2.2l-2.9-2.2c-.8.5-1.8.9-3.1.9-2.4 0-4.4-1.6-5.1-3.8H.9v2.3A9 9 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.9 10.7a5.4 5.4 0 0 1 0-3.4V5H.9a9 9 0 0 0 0 8l3-2.3z"/><path fill="#EA4335" d="M9 3.6c1.3 0 2.5.5 3.4 1.3l2.6-2.6A9 9 0 0 0 .9 5l3 2.3C4.6 5.2 6.6 3.6 9 3.6z"/></svg>Inloggen met Google</button>
+  <button class="link" type="button" id="gateReset">Wachtwoord vergeten?</button><p class="small" id="gateMsg" role="status"></p></div>`;
+}
+function bindGate(){
+  const f=$('#gateForm');if(!f)return;const msg=t=>{$('#gateMsg').textContent=t};
+  const go=async act=>{const m=$('#gateMail').value.trim(),p=$('#gatePass').value;if(!m||!p){msg('Vul je e-mailadres en wachtwoord in.');return}msg(act==='up'?'Account maken…':'Inloggen…');
+    try{if(act==='up')await FB.signUp(m,p);else await FB.signIn(m,p)}catch(e){msg(fbErr(e))}};
+  f.onsubmit=e=>{e.preventDefault();go('in')};$('[data-act="up"]',f).onclick=()=>go('up');
+  $('#gateGoogle').onclick=async()=>{msg('');try{await FB.google()}catch(e){msg(fbErr(e))}};
+  $('#gateReset').onclick=async()=>{const m=$('#gateMail').value.trim();if(!m){msg('Vul eerst je e-mailadres in.');return}try{await FB.reset(m);msg('Je krijgt een e-mail om een nieuw wachtwoord in te stellen.')}catch(e){msg(fbErr(e))}};
+}
+function updateGate(){
+  const ag=$('#authGate'),fr=$('#appShell');if(!ag||!fr)return;
+  const unknown=!('FB' in window);
+  const locked=!unknown&&!!window.FB&&!CLOUD.uid;
+  ag.hidden=!(unknown||locked);fr.hidden=unknown||locked;
+  if(unknown)ag.innerHTML=gateLoadingHtml();
+  else if(locked){ag.innerHTML=gateFormHtml();bindGate()}
 }
 const fbErr=e=>{const c=(e&&e.code)||'';return {
   'auth/invalid-email':'Dit e-mailadres klopt niet.','auth/missing-password':'Vul een wachtwoord in.','auth/weak-password':'Kies een wachtwoord van minstens 6 tekens.',

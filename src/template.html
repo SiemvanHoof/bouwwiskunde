@@ -36,6 +36,9 @@ window.dispatchEvent(new Event('fb-ready'))}
 %%CSS%%
 </style>
 
+<div class="authgate" id="authGate" hidden></div>
+
+<div id="appShell">
 <div class="frame" id="frame">
   <aside class="side" aria-label="Navigatie">
     <div class="brand">
@@ -83,6 +86,7 @@ window.dispatchEvent(new Event('fb-ready'))}
 </div>
 <div id="toast" hidden role="status"></div>
 <div id="celebrate" hidden role="status"></div>
+</div>
 
 <script>
 %%APP_JS%%

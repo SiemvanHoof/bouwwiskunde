@@ -2,6 +2,8 @@
 
 Oefenapp om je voor te bereiden op HBO Bouwkunde: rekenen, wiskunde, natuurkunde, bouwfysica, installaties, bouweconomie en alle bouwkundige begrippen. De app werkt in elke browser en op je telefoon, en bewaart je voortgang in je eigen account.
 
+Als `firebase-config.js` is ingevuld, moet je eerst inloggen of een account maken voordat je de app kunt gebruiken — dat scherm komt automatisch als eerste.
+
 ## Bestanden
 
 | Bestand | Wat |
@@ -12,7 +14,7 @@ Oefenapp om je voor te bereiden op HBO Bouwkunde: rekenen, wiskunde, natuurkunde
 | `manifest.webmanifest`, `icon*.png`, `icon.svg` | Icoon en naam voor "Zet op beginscherm" |
 | `sw.js` | Werkt ook zonder internet met de laatst geladen versie |
 
-Zonder ingevulde `firebase-config.js` werkt de app ook, maar dan blijft de voortgang alleen in die ene browser.
+Zonder ingevulde `firebase-config.js` werkt de app ook zonder inloggen, maar dan blijft de voortgang alleen in die ene browser.
 
 ## Accounts aanzetten met Firebase (gratis, ±10 minuten)
 

@@ -19,7 +19,7 @@ const ok = (msg) => console.log("ok   " + msg);
 const requiredFiles = [
   "src/template.html",
   "src/style.css",
-  "src/app.js",
+  "src/js/manifest.json",
   "build.py",
   "index.html",
   "firebase-config.js",
@@ -38,11 +38,23 @@ if (errors > 0) {
 const html = readFile("index.html");
 const template = readFile("src/template.html");
 const css = readFile("src/style.css");
-const js = readFile("src/app.js");
+const jsManifest = JSON.parse(readFile("src/js/manifest.json"));
+
+// 1b. Elk bestand uit het manifest bestaat ook echt in src/js/
+for (const f of jsManifest) {
+  if (fs.existsSync(path.join(ROOT, "src/js", f))) ok(`src/js/${f} bestaat`);
+  else fail(`src/js/${f} staat in manifest.json maar bestaat niet`);
+}
+if (errors > 0) {
+  console.log(`\nerrors ${errors}`);
+  process.exit(1);
+}
+
+const js = jsManifest.map((f) => readFile(`src/js/${f}`)).join("");
 
 // 2. index.html is daadwerkelijk gebouwd uit de huidige src/ bestanden
 // split/join i.p.v. replace(): replace() behandelt $-tekens in de
-// vervangstring speciaal (css/app.js staan vol met ${...}), split/join niet.
+// vervangstring speciaal (css/app-js staan vol met ${...}), split/join niet.
 const expected = template
   .split("%%CSS%%\n").join(css)
   .split("%%APP_JS%%\n").join(js);
