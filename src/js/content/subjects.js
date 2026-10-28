@@ -12,7 +12,8 @@ const SUBJECTS=[
     {name:'Ontwerp en tekenen',mods:['tekeningen','architectuur','bim','stedenbouw']},
     {name:'Bouwproces',mods:['bouwproces','uitvoering']},
     {name:'Regelgeving en duurzaamheid',mods:['regels','veiligheid','duurzaam']},
-    {name:'Bestaande bouw',mods:['bestaand']}]},
+    {name:'Bestaande bouw',mods:['bestaand']},
+    {name:'Loopbaan en vervolgstudie',mods:['beroepen','vervolgstudies']}]},
   {id:'g-natuurkunde',name:'Natuurkunde en constructie',cats:[
     {name:'Natuurkunde',mods:['natuurkunde','warmte']},
     {name:'Mechanica en sterkte',mods:['mechanica','sterkte']}]},

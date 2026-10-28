@@ -56,6 +56,21 @@ Nieuw bestand toevoegen? Zet het in de juiste map én voeg het toe aan
 `src/js/manifest.json` op de plek waar het logisch (en functioneel) hoort
 — anders komt het niet in de build terecht.
 
+Nieuw begrippen-hoofdstuk toevoegen (zoals de modules `beroepen` en
+`vervolgstudies`, vak Bouwkunde → categorie "Loopbaan en vervolgstudie")?
+Volg het patroon in `content/modules-uitbreiding-5.js`: `addSub(ch, sub,
+naam, [[begrip, uitleg], ...], scenarios?)` registreert de content in
+`TERMS`/`TERMSUB`/`SCEN`, `T(ch, sub)` maakt er een oefenbare `sub` van
+(hergebruikt dezelfde multiple-choice generator `genTerm` als alle andere
+begrippenmodules), en `MODS.push(m); MOD[m.id]=m` registreert de module.
+Kies een sub-id die nog nergens anders gebruikt wordt — `TERMSUB` is
+app-breed, niet per hoofdstuk, dus hergebruik van een bestaande sub-id
+overschrijft per ongeluk een andere module (geef sub-ids een duidelijk
+voorvoegsel, zoals `ber-` of `vs-`, om dat te voorkomen). Voeg de module
+daarna toe aan een categorie in `content/subjects.js`; de volgorde daar
+bepaalt automatisch de code (bijv. `B-16`) en welke module eerst af moet
+zijn (`m.prev`).
+
 ## Inlogpoort
 
 Als `firebase-config.js` een echte Firebase-config bevat, moet je inloggen
