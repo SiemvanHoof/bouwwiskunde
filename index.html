@@ -1304,6 +1304,13 @@ function genVergelijking(l){
     else{const a=pick([2,3,4,5]);const b=nz(-6,6);const c=b+nz(-6,6);x=a*(c-b);e=`${Fh('x',a)} ${b<0?'−':'+'} ${Math.abs(b)} = ${N(c)}`;st=[`${b<0?'Tel '+(-b)+' op':'Haal '+b+' eraf'}: ${Fh('x',a)} = ${N(c-b)}`,`Vermenigvuldig met ${a}: x = ${N(x)}`]}}
   return {q:`Los op:<div class="expr">${e}</div>`,type:'num',answer:x,hint:'Balansmethode: doe aan beide kanten van het =-teken hetzelfde, tot x alleen staat.',sol:steps(st),calc:false};
 }
+function genOngelijkheid(l){
+  const dir=pick(['<','>','≤','≥']);const flipMap={'<':'>','>':'<','≤':'≥','≥':'≤'};
+  if(l<3){const a=R(2,9),b=nz(-15,15),x=nz(-8,8);const c=a*x+b;const right=`x ${dir} ${N(x)}`;
+    return {q:`Los op:<div class="expr">${polyStr([a,b])} ${dir} ${N(c)}</div>`,...mc(right,[`x ${flipMap[dir]} ${N(x)}`,`x ${dir} ${N(-x)}`,`x ${flipMap[dir]} ${N(-x)}`]),hint:'Werk net als bij een vergelijking: wat je links doet, doe je ook rechts.',sol:steps([`${a}x ${dir} ${N(c-b)}`,`x ${dir} ${N(x)}`])}}
+  const a=nz(-9,-2),b=nz(-15,15),x=nz(-8,8);const c=a*x+b;const eff=flipMap[dir];const right=`x ${eff} ${N(x)}`;
+  return {q:`Los op:<div class="expr">${polyStr([a,b])} ${dir} ${N(c)}</div>`,...mc(right,[`x ${dir} ${N(x)}`,`x ${eff} ${N(-x)}`,`x ${dir} ${N(-x)}`]),hint:'Vermenigvuldig of deel je met een negatief getal, dan draait het ongelijkheidsteken om.',sol:steps([`${a}x ${dir} ${N(c-b)}`,`Delen door ${a} (negatief) → teken draait om`,`x ${eff} ${N(x)}`])};
+}
 function genInvullen(l){
   const T1=[
     ()=>{const lv=rnd(R(25,90)/10,1),b=rnd(R(20,60)/10,1);const v=lv*b;return {f:'A = l · b',g:`l = ${N(lv)} m en b = ${N(b)} m`,v,u:'m²',st:[`A = ${N(lv)} × ${N(b)} = ${N(v,2)} m²`]}},
@@ -1648,6 +1655,14 @@ function genGemiddelde(l){
   if(v<0||v>150)return genGemiddelde(l);
   return {q:`De druksterkte van ${k} betonkubussen moet gemiddeld <b>${doel} N/mm²</b> zijn. Drie kubussen geven ${xs.join(', ')} N/mm². Welke waarde moet de vierde kubus minimaal hebben?`,type:'num',answer:v,unit:'N/mm²',hint:'Het totaal moet gemiddelde × aantal zijn. Trek daar de bekende waarden van af.',sol:steps([`Benodigd totaal: ${doel} × ${k} = ${doel*k}`,`Al bekend: ${xs.join(' + ')} = ${xs.reduce((a,b)=>a+b,0)}`,`Vierde kubus: ${doel*k} − ${xs.reduce((a,b)=>a+b,0)} = ${v} N/mm²`])};
 }
+function genVerhouding(l){
+  if(l===1){const a=R(1,6),b=R(1,6),tot=(a+b)*R(4,40);const deel1=tot*a/(a+b);
+    return {q:`Twee aannemers verdelen een opdracht van <b>${N(tot)} uur</b> in de verhouding <b>${a} : ${b}</b>. Hoeveel uur krijgt de eerste aannemer?`,type:'num',answer:deel1,unit:'uur',hint:'Deel het totaal door (a + b) en vermenigvuldig met a.',sol:steps([`${N(tot)} ÷ (${a} + ${b}) = ${N(tot/(a+b),2)} per deel`,`Eerste deel: ${a} × ${N(tot/(a+b),2)} = ${N(deel1,2)} uur`]),calc:false}}
+  if(l===2){const a=R(2,7),b=R(2,7),k=rnd(R(10,200)/10,1);const bekend=clean(k*a),zand=clean(k*b);
+    return {q:`Cement en zand worden gemengd in de verhouding <b>${a} : ${b}</b>. Je gebruikt <b>${N(bekend,1)} kg</b> cement. Hoeveel kg zand heb je nodig? (1 decimaal)`,type:'num',answer:zand,dec:1,unit:'kg',hint:'Deel door het cement-deel, vermenigvuldig met het zand-deel.',sol:steps([`${N(bekend,1)} ÷ ${a} = ${N(k,2)} per deel`,`${N(k,2)} × ${b} = ${N(zand,2)} kg zand`])}}
+  const a=R(2,5),b=R(2,5),c=R(2,5),tot=(a+b+c)*R(5,25);
+  return {q:`Een bedrag van <b>€ ${N(tot)}</b> wordt verdeeld over drie vennoten in de verhouding <b>${a} : ${b} : ${c}</b>. Hoeveel krijgt de derde vennoot? (2 decimalen)`,type:'num',answer:tot*c/(a+b+c),dec:2,unit:'€',unitPre:true,hint:'Deel het totaal door (a + b + c) en vermenigvuldig met c.',sol:steps([`€ ${N(tot)} ÷ (${a}+${b}+${c}) = € ${N(tot/(a+b+c),2)} per deel`,`Derde vennoot: ${c} × € ${N(tot/(a+b+c),2)} = € ${N(tot*c/(a+b+c),2)}`])};
+}
 // W-03 eenheden: tijd, snelheid, debiet
 function genTijd(l){
   if(l===1){if(Math.random()<.5){const u=pick([0.25,0.5,0.75,1.5,2.25,2.5,3.75]);return {q:`Hoeveel minuten is <b>${N(u)} uur</b>?`,type:'num',answer:u*60,unit:'min',hint:'1 uur = 60 minuten. ¼ uur = 15 min.',sol:steps([`${N(u)} × 60 = ${N(u*60)} min`]),calc:false}}
@@ -1963,6 +1978,14 @@ function genDauw(l){
   return {q:`Binnenlucht is <b>${T} °C</b> met <b>${rv}%</b> RV. Bepaal het dauwpunt door te interpoleren in de tabel. Rond af op 1 decimaal.${psatTable()}`,type:'num',answer:d,dec:1,unit:'°C',hint:'Bereken p_w = RV × p_sat(T). Zoek tussen welke twee tabelwaarden p_w ligt en interpoleer lineair.',sol:steps([`p_w = ${N(rv/100)} × ${ps} = ${N(pw,1)} Pa`,`Ligt tussen ${PSAT.filter(r=>r[1]<=pw).slice(-1)[0].join(' °C: ')} Pa en ${PSAT.find(r=>r[1]>pw).join(' °C: ')} Pa`,`Dauwpunt ≈ ${N(d,2)} °C`,'Oppervlakken kouder dan het dauwpunt worden nat.'])};
 }
 
+function genGeluidwering(l){
+  if(l===1){const Lz=R(70,95),Rw=pick([42,47,52,57,62]);const Lo=Lz-Rw;
+    return {q:`In de naburige ruimte is het geluidsniveau <b>${Lz} dB</b>. De scheidingswand heeft een geluidsisolatie (R<sub>w</sub>) van <b>${Rw} dB</b>. Welk niveau komt er ongeveer door in de ontvangende ruimte?`,type:'num',answer:Lo,unit:'dB',hint:'Ontvangen niveau ≈ zendend niveau − R_w van de wand.',sol:steps([`${Lz} − ${Rw} = ${Lo} dB`]),calc:false}}
+  if(l===2){const Lz=R(75,95),eis=pick([30,35,40]);const RwMin=Lz-eis;
+    return {q:`Het bronniveau in de buurwoning is <b>${Lz} dB</b>. De eis is dat er niet meer dan <b>${eis} dB</b> doorkomt. Welke geluidsisolatie (R<sub>w</sub>) moet de scheidingswand minimaal hebben?`,type:'num',answer:RwMin,unit:'dB',hint:'R_w ≥ zendend niveau − toegestaan niveau.',sol:steps([`R_w ≥ ${Lz} − ${eis} = ${RwMin} dB`])}}
+  const Lz=R(80,95),Rw=pick([42,47,52]),extra=pick([3,5,8,10]);const Lo=Lz-Rw-extra;
+  return {q:`Een scheidingswand heeft R<sub>w</sub> = <b>${Rw} dB</b>. Je monteert er een voorzetwand voor die (vereenvoudigd) <b>${extra} dB</b> extra isolatie geeft. Het bronniveau is <b>${Lz} dB</b>. Welk niveau komt er nu ongeveer door?`,type:'num',answer:Lo,unit:'dB',hint:'Tel de extra isolatie bij de R_w van de wand op en trek het totaal van het bronniveau af.',sol:steps([`R_w totaal ≈ ${Rw} + ${extra} = ${Rw+extra} dB`,`${Lz} − ${Rw+extra} = ${Lo} dB`,'Vereenvoudigd rekenmodel: in werkelijkheid telt een voorzetwand niet altijd zomaar bij de R_w op.'])};
+}
 // ---- Bouweconomie ----
 function genKostprijs(l){
   if(l===1){const A=R(80,250),K=A*pick([1450,1650,1850,2100,2400]);return {q:`De bouwkosten van een woning met <b>${A} m²</b> bruto vloeroppervlak (BVO) zijn <b>€ ${N(K)}</b>. Wat is de prijs per m² BVO?`,type:'num',answer:K/A,dec:2,unit:'€/m²',hint:'Prijs per m² = totale kosten ÷ oppervlak',sol:steps([`€ ${N(K)} ÷ ${A} = € ${N(K/A,2)} per m²`])}}
@@ -3853,6 +3876,10 @@ add('rekenen',{id:'gemiddelde',name:'Gemiddelde',gen:genGemiddelde},{t:'Gemiddel
 <p>Bij een <b>gewogen gemiddelde</b> telt niet elke waarde even zwaar. Vermenigvuldig elke waarde met zijn weging, tel op en deel door de som van de wegingen.</p>
 ${ex('Voorbeeld',`<p>Cijfers 6 (weging 1), 7 (weging 1) en 8 (weging 2): (6 + 7 + 2 × 8) ÷ 4 = 29 ÷ 4 = <b>7,25</b></p>`)}
 <p>In de bouw: gemiddelde productie per dag, gemiddelde druksterkte van betonproefkubussen, gemiddelde prijs per m².</p>`});
+add('rekenen',{id:'verhouding',name:'Verhoudingen verdelen',gen:genVerhouding},{t:'Een geheel verdelen in een verhouding',h:`<p>Een verhouding zoals <b>2 : 3</b> verdeelt een geheel in gelijke "delen": 2 delen voor de één, 3 voor de ander, samen 5 delen.</p>
+<ol class="steps plain"><li>Tel de delen van de verhouding bij elkaar op.</li><li>Deel het totaal (of de bekende hoeveelheid) door dat aantal delen.</li><li>Vermenigvuldig met het aantal delen dat je zoekt.</li></ol>
+${ex('Voorbeeld',`<p>€ 400 verdelen in de verhouding 1 : 3: samen 4 delen, 400 ÷ 4 = 100 per deel → <b>€ 100</b> en <b>€ 300</b>.</p>`)}
+<p>In de bouw: cement-zandverhoudingen in mortel, winstverdeling tussen vennoten, materiaalverdeling tussen onderaannemers.</p>`});
 add('eenheden',{id:'tijd',name:'Tijd, snelheid en debiet',gen:genTijd},{t:'Tijd, snelheid en debiet',h:`<ul class="rules"><li>1 uur = 60 min = 3600 s. Let op: 1,5 uur = 1 uur en 30 minuten (níet 1 uur en 50 min).</li><li><b>Snelheid</b> v = s / t. Omrekenen: km/h ÷ 3,6 = m/s.</li><li><b>Debiet</b> (hoeveelheid per tijd) Q = V / t, bijv. L/min of m³/h.</li></ul>
 ${ex('Voorbeeld',`<p>Pomp 18 m³/h = 18 000 L / 3600 s = <b>5 L/s</b>.</p>`)}`});
 add('machten',{id:'wortelvgl',name:'Wortels in de praktijk',gen:genWortelVgl},{t:'Terugrekenen met wortels',h:`<p>Ken je een oppervlak of inhoud en zoek je een maat, dan gebruik je een wortel:</p>
@@ -3868,6 +3895,10 @@ add('algebra',{id:'stelsel',name:'Stelsels van vergelijkingen',gen:genStelsel},{
 <ul class="rules"><li><b>Substitutie:</b> schrijf één vergelijking als y = …, en vul dat in de andere in.</li><li><b>Eliminatie:</b> vermenigvuldig de vergelijkingen zodat x (of y) dezelfde coëfficiënt krijgt en trek ze van elkaar af.</li></ul>
 ${ex('Voorbeeld',`<p>x + y = 10 en x − y = 4 → optellen: 2x = 14 → x = 7, y = 3.</p>`)}
 <p>Toepassing: break-even van twee offertes, het snijpunt van twee lijnen.</p>`});
+add('algebra',{id:'ongelijkheid',name:'Ongelijkheden oplossen',gen:genOngelijkheid},{t:'Ongelijkheden: <, >, ≤, ≥',h:`<p>Een ongelijkheid los je op zoals een vergelijking: doe links en rechts hetzelfde. Er is één belangrijk verschil:</p>
+${pit('Vermenigvuldig of deel je met een <b>negatief</b> getal, dan draait het ongelijkheidsteken om: < wordt >, ≤ wordt ≥ (en omgekeerd).')}
+${ex('Voorbeeld',`<p>−2x + 3 &lt; 11 → −2x &lt; 8 → (delen door −2, teken draait om) → x &gt; −4.</p>`)}
+<p>Toepassing: vanaf welke hoeveelheid is een optie goedkoper, welke maten voldoen minimaal aan een eis.</p>`});
 add('lineair',{id:'interp',name:'Interpoleren in tabellen',gen:genInterp},{t:'Lineair interpoleren',h:`<p>Tabellen in normen en bouwfysica geven waarden bij vaste stappen. Ligt jouw waarde ertussen, dan interpoleer je: je doet alsof het verband tussen twee tabelregels een rechte lijn is.</p>
 <div class="formula-box">y = y₁ + (y₂ − y₁) × ${Fh('x − x₁','x₂ − x₁')}</div>
 ${ex('Voorbeeld',`<p>Bij 10 °C: 1228 Pa, bij 12 °C: 1402 Pa. Bij 11 °C: 1228 + 174 × ½ = <b>1315 Pa</b>.</p>`)}`});
@@ -3919,7 +3950,7 @@ MODS.push(
  ${pit('Diameter in mm eerst naar m. A = ¼πd² met d in meter.')}`}],
  formulas:[]},
 {id:'geluid',name:'Bouwfysica: geluid en vocht',blurb:'Decibellen optellen, geluid over afstand, relatieve vochtigheid, dauwpunt en condensatie.',
- subs:[{id:'dbsom',name:'Decibellen optellen',gen:genDbOptellen},{id:'dbafstand',name:'Geluid en afstand',gen:genDbAfstand},{id:'rv',name:'Relatieve vochtigheid',gen:genRV},{id:'dauw',name:'Dauwpunt',gen:genDauw}],
+ subs:[{id:'dbsom',name:'Decibellen optellen',gen:genDbOptellen},{id:'dbafstand',name:'Geluid en afstand',gen:genDbAfstand},{id:'rv',name:'Relatieve vochtigheid',gen:genRV},{id:'dauw',name:'Dauwpunt',gen:genDauw},{id:'wering',name:'Geluidwering',gen:genGeluidwering}],
  theory:[
  {t:'De decibelschaal',sub:'dbsom',h:`<p>Geluidsniveau L wordt uitgedrukt in decibel (dB). De schaal is <b>logaritmisch</b>: +10 dB is tien keer zoveel geluidsenergie (en klinkt ongeveer twee keer zo hard).</p>
  <div class="formula-grid"><div>Twee gelijke bronnen: +3 dB</div><div>n gelijke bronnen: L + 10·log(n)</div><div>Verschillende bronnen: L = 10·log(Σ 10<sup>L/10</sup>)</div></div>
@@ -3931,7 +3962,10 @@ MODS.push(
  <p>Koelt lucht af, dan blijft p<sub>w</sub> gelijk maar wordt p<sub>sat</sub> kleiner: de RV stijgt. Bij 100% ontstaat condens.</p>${psatTable()}`},
  {t:'Dauwpunt en condensatie',sub:'dauw',h:`<p>Het <b>dauwpunt</b> is de temperatuur waarbij p<sub>sat</sub> gelijk is aan de aanwezige dampdruk. Elk oppervlak dat kouder is dan het dauwpunt, wordt nat.</p>
  <ol class="steps plain"><li>Bereken p<sub>w</sub> = RV × p<sub>sat</sub>(T<sub>binnen</sub>).</li><li>Zoek in de tabel bij welke temperatuur p<sub>sat</sub> = p<sub>w</sub> (interpoleren).</li><li>Vergelijk met de oppervlaktetemperatuur van wand of raam.</li></ol>
- <p>Daarom zijn koudebruggen en enkel glas berucht: daar condenseert vocht en groeit schimmel.</p>`}],
+ <p>Daarom zijn koudebruggen en enkel glas berucht: daar condenseert vocht en groeit schimmel.</p>`},
+ {t:'Geluidwering tussen ruimtes',sub:'wering',h:`<p>Een scheidingswand of -vloer dempt geluid met zijn <b>geluidsisolatie R<sub>w</sub></b> (in dB): hoe hoger R<sub>w</sub>, hoe minder er doorkomt.</p>
+ <div class="formula-box">L<sub>ontvangst</sub> ≈ L<sub>zender</sub> − R<sub>w</sub></div>
+ <p>Het Bbl stelt eisen aan de geluidwering tussen woningen (scheidingswanden en -vloeren tussen verblijfsgebieden). Een voorzetwand of extra isolatielaag verhoogt R<sub>w</sub>, maar niet altijd lineair — reken in oefeningen hier vereenvoudigd mee.</p>`}],
  formulas:[]},
 {id:'economie',name:'Bouweconomie',blurb:'Kengetallen per m², begrotingsopslagen, rente en afschrijving. De rekenkant van bouwprojecten.',
  subs:[{id:'kostprijs',name:'Kengetallen en m²-prijs',gen:genKostprijs},{id:'begroting',name:'Begroting en opslagen',gen:genBegroting},{id:'rente',name:'Rente',gen:genRente},{id:'afschr',name:'Afschrijving',gen:genAfschr}],
@@ -3954,20 +3988,20 @@ MODS.forEach((m,i)=>{m.code='W-'+String(i+1).padStart(2,'0');MOD[m.id]=m;
 // leerdoelen per niveau
 const G={
 basis:[['Optellen, aftrekken, tafels en delen uit je hoofd','Komma verschuiven bij ×/÷ 10, 100, 1000','Afronden op hele getallen'],['Grotere getallen splitsen en onder elkaar rekenen','Kommagetallen vermenigvuldigen','Eenvoudige verhaaltjessommen (naar boven afronden)'],['Kommagetallen optellen en delen zonder rekenmachine','Rekenen met meerdere stappen (verlies, verpakking, prijs)']],
-rekenen:[['Rekenen met negatieve getallen','Volgorde van bewerkingen','Breuken met gelijke noemers, percentages'],['Gelijknamig maken, btw berekenen','Procentuele verandering','Gewogen gemiddelde'],['Delen door breuken, gemengde getallen','Terugrekenen van inclusief naar exclusief','Opeenvolgende procentuele veranderingen']],
+rekenen:[['Rekenen met negatieve getallen','Volgorde van bewerkingen','Breuken met gelijke noemers, percentages','Verhouding in 2 delen'],['Gelijknamig maken, btw berekenen','Procentuele verandering','Gewogen gemiddelde','Verhouding uit een bekend deel'],['Delen door breuken, gemengde getallen','Terugrekenen van inclusief naar exclusief','Opeenvolgende procentuele veranderingen','Verhouding in 3 delen']],
 eenheden:[['Lengte-eenheden omrekenen (mm–m)','m³ ↔ liter','kg → N met g = 10'],['Oppervlakte- en inhoudsfactoren','Snelheid en debiet','N/mm², kN/m², MPa'],['Mm-maten → m² en m³','Eigen gewicht in kN','Samengestelde eenheden (m³/h → L/s, km/h → m/s)']],
 machten:[['Machten en wortels uit je hoofd','Machten van 10'],['Rekenregels voor machten','Negatieve exponenten','Wetenschappelijke notatie'],['Gebroken exponenten','Wortels vereenvoudigen','Terugrekenen met ∛ en √(4A/π)']],
 schaal:[['Tekenmaat ↔ werkelijke maat op 1:100','Rechte evenredigheid'],['Andere schalen, schaal bepalen','Omgekeerde evenredigheid','Mengverhoudingen'],['Oppervlakte op schaal (n²)','Water-cementfactor','Meerstaps verhoudingen']],
 meetkunde:[['Omtrek en oppervlak van rechthoek en driehoek','Inhoud van een balk','Pythagoras: schuine zijde'],['Cirkel, trapezium, maten in mm','Betonvolumes','Gevels met openingen'],['L-vormen en samengestelde figuren','Cilinders, ruimtediagonaal','Rondbogen, haaksheid controleren']],
 natuurkunde:[['ρ = m/V','Druk p = F/A','Arbeid W = F·s'],['Massa uit volume en dichtheid','Waterdruk p = ρgh','Zwaarte-energie, vermogen'],['Massa per meter van profielen','Opwaartse waterdruk op kelders','Rendement, kWh en kosten']],
-algebra:[['Formules invullen','Eenvoudige vergelijkingen','Haakjes wegwerken a(b+c)','Formules met × en ÷ omwerken'],['Vergelijkingen met x aan beide kanten','(a+b)(c+d)','Stelsels door substitutie'],['Merkwaardige producten','Formules met wortels en kwadraten omwerken','Stelsels door eliminatie']],
+algebra:[['Formules invullen','Eenvoudige vergelijkingen','Haakjes wegwerken a(b+c)','Formules met × en ÷ omwerken','Eenvoudige ongelijkheid (positief getal)'],['Vergelijkingen met x aan beide kanten','(a+b)(c+d)','Stelsels door substitutie'],['Merkwaardige producten','Formules met wortels en kwadraten omwerken','Stelsels door eliminatie','Ongelijkheid: teken draait om bij een negatief getal']],
 lineair:[['y = ax + b invullen','Richtingscoëfficiënt uit twee punten','Afschot in %','Optrede berekenen'],['Vergelijking oplossen met een lineaire formule','Afschot → mm','Minimaal aantal optredes','Interpoleren'],['Snijpunt van lijnen, b berekenen','Afschot 1:n','Stapmaatregel','Interpoleren met 3 decimalen']],
 gonio:[['sin en cos met de schuine zijde','tan met twee rechthoekszijden','Hoekensom 180°'],['Inverse functies voor hoeken','Sparlengte','Sinusregel'],['Alle combinaties SOS-CAS-TOA','Helling % ↔ graden','Cosinusregel']],
 kwadratisch:[['x² = c, product = 0','Discriminant uitrekenen','Top van een parabool (x)'],['Ontbinden met product-som','Aantal oplossingen','y-top'],['abc-formule','Parameter bij D = 0','Toepassingen met paden en bogen']],
 mechanica:[['Krachten op één lijn','σ = F/A','M = F·a','q × L','Gronddruk q/b'],['Resultante van loodrechte krachten','Ronde kolommen','Hefboom','Oplegreacties','Lijnlast uit vloerlast'],['Kracht ontbinden','Kolom dimensioneren','Meerdere lasten','M = ⅛qL²','Poer dimensioneren']],
 installaties:[['U = I·R','P = U·I','kWh berekenen','Q = V/t'],['I en R uitrekenen','Stroom van een apparaat','Energiekosten','Q = A·v'],['Serie en parallel','Groepsbelasting t.o.v. 16 A','COP warmtepomp','Leidingdiameter bepalen']],
 bouwfysica:[['R = d/λ','Rc door optellen','U = 1/R','ΔT'],['Benodigde dikte','U met Rsi en Rse','Isolatie voor een Rc-eis','Φ = U·A·ΔT'],['Rc met spouw','U uit lagen','Gevel met glas','Oppervlaktetemperatuur']],
-geluid:[['Twee gelijke bronnen +3 dB','−6 dB per verdubbeling','RV = pw/psat','Dauwpunt aflezen'],['n bronnen: +10·log n','20·log(r₂/r₁)','pw uit RV','Dauwpunt interpoleren'],['Ongelijke bronnen','Lijnbron','RV na afkoeling: condens?','Condensatierisico']],
+geluid:[['Twee gelijke bronnen +3 dB','−6 dB per verdubbeling','RV = pw/psat','Dauwpunt aflezen','Geluidwering: L − Rw'],['n bronnen: +10·log n','20·log(r₂/r₁)','pw uit RV','Dauwpunt interpoleren','Benodigde Rw bij een eis'],['Ongelijke bronnen','Lijnbron','RV na afkoeling: condens?','Condensatierisico','Rw met een voorzetwand']],
 economie:[['Prijs per m²','Opslag algemene kosten','Enkelvoudige rente','Lineaire afschrijving'],['Raming met kengetal','Gestapelde opslagen','Samengestelde rente','Boekwaarde'],['GO/BVO','Volledige begroting tot m²-prijs','Contante waarde','Degressieve afschrijving']]};
 MODS.forEach(m=>m.goals=G[m.id]||[[],[],[]]);
 })();
@@ -4000,7 +4034,9 @@ FC(2,'Gemiddelde','x̄ = {{x₁ + x₂ + … + xₙ|n}}',[['n','aantal waarden',
 FC(2,'Gewogen gemiddelde','x̄ = {{Σ (wᵢ · xᵢ)|Σ wᵢ}}',[['wᵢ','weging van waarde i','']],'Cijfers met verschillende weging, gemiddelde prijs bij verschillende hoeveelheden.','6 (×1), 7 (×1), 8 (×2): 29 ÷ 4 = 7,25'),
 FC(3,'Delen door een breuk','{{a|b}} ÷ {{c|d}} = {{a|b}} × {{d|c}}',[],'Vermenigvuldig met het omgekeerde.','{{3|4}} ÷ {{1|2}} = {{3|4}} × 2 = {{3|2}}'),
 FC(3,'Terugrekenen (exclusief uit inclusief)','oud = {{nieuw|g}}',[['g','groeifactor','']],'Bedrag zonder btw uit een bedrag met btw.','€ 968 incl. 21%: 968 ÷ 1,21 = € 800','Niet 21% van € 968 aftrekken.'),
-FC(3,'Opeenvolgende veranderingen','g<sub>totaal</sub> = g₁ × g₂ × …',[],'Meerdere jaren prijsstijging, korting op korting.','+20% en −20%: 1,2 × 0,8 = 0,96 → −4%','Percentages niet optellen.')],
+FC(3,'Opeenvolgende veranderingen','g<sub>totaal</sub> = g₁ × g₂ × …',[],'Meerdere jaren prijsstijging, korting op korting.','+20% en −20%: 1,2 × 0,8 = 0,96 → −4%','Percentages niet optellen.'),
+FC(1,'Verhouding verdelen (2 delen)','deel = totaal × {{eigen aandeel|som van de delen}}',[],'Een bedrag, hoeveelheid of mengsel in een gegeven verhouding splitsen.','€ 400 in 1:3 → 100 en 300'),
+FC(3,'Verhouding verdelen (3 delen)','deel = totaal × {{eigen aandeel|som van de delen}}',[],'Verdelen over drie partijen of ingrediënten.','€ 600 in 1:2:3 → 100, 200, 300')],
 eenheden:[
 FC(1,'Lengte','1 km = 1000 m &nbsp;·&nbsp; 1 m = 10 dm = 100 cm = 1000 mm',[],'Tekeningmaten (mm) omzetten naar rekenmaten (m).','3600 mm = 3,6 m'),
 FC(1,'Inhoud en liter','1 m³ = 1000 dm³ = 1000 L &nbsp;·&nbsp; 1 dm³ = 1 L &nbsp;·&nbsp; 1 cm³ = 1 mL',[],'Water, reservoirs, beton.','2,5 m³ = 2500 L'),
@@ -4067,7 +4103,9 @@ FC(2,'x aan beide kanten','ax + b = cx + d &nbsp;⇒&nbsp; x = {{d − b|a − c
 FC(2,'Substitutie','y = … invullen in de andere vergelijking',[],'Stelsel met één vergelijking in de vorm y = ….','y = 2x + 1 en x + y = 7 → 3x + 1 = 7 → x = 2'),
 FC(3,'Merkwaardige producten','(a ± b)² = a² ± 2ab + b² &nbsp;·&nbsp; (a + b)(a − b) = a² − b²',[],'Snel uitwerken en ontbinden.','(x + 3)² = x² + 6x + 9','(x + 3)² ≠ x² + 9'),
 FC(3,'Omwerken met kwadraat','y = a x² &nbsp;⇒&nbsp; x = √({{y|a}})',[],'L uit M = qL²/8, r uit V = πr²h.','L = √(8M / q)'),
-FC(3,'Eliminatie','vermenigvuldig zodat een onbekende wegvalt, dan aftrekken',[],'Algemene stelsels.','2x + 3y = 12 en x − y = 1: ×2 → 5y = 10 → y = 2')],
+FC(3,'Eliminatie','vermenigvuldig zodat een onbekende wegvalt, dan aftrekken',[],'Algemene stelsels.','2x + 3y = 12 en x − y = 1: ×2 → 5y = 10 → y = 2'),
+FC(1,'Ongelijkheid oplossen','net als een vergelijking, teken blijft gelijk bij × of ÷ met een positief getal',[],'Grenswaarden en voorwaarden.','2x + 3 < 11 → x < 4'),
+FC(3,'Ongelijkheid: teken draait om','bij × of ÷ met een negatief getal draait < om in > (en omgekeerd)',[],'Vergeet dit niet bij een negatieve x-term.','−2x < 8 → x > −4 (niet x < −4)')],
 lineair:[
 FC(1,'Lineaire formule','y = a x + b',[['a','richtingscoëfficiënt (helling)',''],['b','startgetal (y bij x = 0)','']],'Vaste kosten + kosten per eenheid; rechte lijnen.','K = 85d + 250 → 5 dagen: € 675'),
 FC(1,'Richtingscoëfficiënt','a = {{Δy|Δx}} = {{y₂ − y₁|x₂ − x₁}}',[],'Helling uit twee punten.','(1, 3) en (4, 9): a = 6/3 = 2'),
@@ -4152,7 +4190,9 @@ FC(2,'Puntbron (algemeen)','L₂ = L₁ − 20 · log({{r₂|r₁}})',[['r','afs
 FC(2,'Dampdruk','p<sub>w</sub> = RV · p<sub>sat</sub>',[],'Hoeveel waterdamp er in de lucht zit.','60% bij 20 °C: 1403 Pa'),
 FC(3,'Ongelijke bronnen','L = 10 · log(10<sup>L₁/10</sup> + 10<sup>L₂/10</sup>)',[],'Bronnen met verschillend niveau.','80 + 74 dB = 81 dB'),
 FC(3,'Lijnbron','L₂ = L₁ − 10 · log({{r₂|r₁}})',[],'Weg- en spoorverkeer: −3 dB per verdubbeling.','70 dB op 25 m → 64 dB op 100 m'),
-FC(3,'Condensatie-check','condens als θ<sub>oppervlak</sub> &lt; θ<sub>dauw</sub>',[],'Ramen, koudebruggen.','')],
+FC(3,'Condensatie-check','condens als θ<sub>oppervlak</sub> &lt; θ<sub>dauw</sub>',[],'Ramen, koudebruggen.',''),
+FC(1,'Geluidwering van een wand','L<sub>ontvangst</sub> ≈ L<sub>zender</sub> − R<sub>w</sub>',[['R<sub>w</sub>','geluidsisolatie van de wand','dB']],'Wat er bij de buren doorkomt.','85 − 52 = 33 dB'),
+FC(3,'Extra isolatie (vereenvoudigd)','R<sub>w,totaal</sub> ≈ R<sub>w</sub> + ΔR',[['ΔR','extra isolatie, bv. voorzetwand','dB']],'Schatting van het effect van een voorzetwand.','52 + 5 = 57 dB')],
 economie:[
 FC(1,'Prijs per m²','p = {{K|A}}',[['K','kosten','€'],['A','oppervlak (BVO of GO)','m²']],'Projecten vergelijken.','€ 300 000 / 150 m² = € 2000/m²'),
 FC(1,'Opslag','K<sub>nieuw</sub> = K · (1 + {{p|100}})',[],'Algemene kosten, winst en risico, btw.','€ 100 000 + 8% AK = € 108 000'),

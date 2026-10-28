@@ -158,6 +158,13 @@ function genVergelijking(l){
     else{const a=pick([2,3,4,5]);const b=nz(-6,6);const c=b+nz(-6,6);x=a*(c-b);e=`${Fh('x',a)} ${b<0?'−':'+'} ${Math.abs(b)} = ${N(c)}`;st=[`${b<0?'Tel '+(-b)+' op':'Haal '+b+' eraf'}: ${Fh('x',a)} = ${N(c-b)}`,`Vermenigvuldig met ${a}: x = ${N(x)}`]}}
   return {q:`Los op:<div class="expr">${e}</div>`,type:'num',answer:x,hint:'Balansmethode: doe aan beide kanten van het =-teken hetzelfde, tot x alleen staat.',sol:steps(st),calc:false};
 }
+function genOngelijkheid(l){
+  const dir=pick(['<','>','≤','≥']);const flipMap={'<':'>','>':'<','≤':'≥','≥':'≤'};
+  if(l<3){const a=R(2,9),b=nz(-15,15),x=nz(-8,8);const c=a*x+b;const right=`x ${dir} ${N(x)}`;
+    return {q:`Los op:<div class="expr">${polyStr([a,b])} ${dir} ${N(c)}</div>`,...mc(right,[`x ${flipMap[dir]} ${N(x)}`,`x ${dir} ${N(-x)}`,`x ${flipMap[dir]} ${N(-x)}`]),hint:'Werk net als bij een vergelijking: wat je links doet, doe je ook rechts.',sol:steps([`${a}x ${dir} ${N(c-b)}`,`x ${dir} ${N(x)}`])}}
+  const a=nz(-9,-2),b=nz(-15,15),x=nz(-8,8);const c=a*x+b;const eff=flipMap[dir];const right=`x ${eff} ${N(x)}`;
+  return {q:`Los op:<div class="expr">${polyStr([a,b])} ${dir} ${N(c)}</div>`,...mc(right,[`x ${dir} ${N(x)}`,`x ${eff} ${N(-x)}`,`x ${dir} ${N(-x)}`]),hint:'Vermenigvuldig of deel je met een negatief getal, dan draait het ongelijkheidsteken om.',sol:steps([`${a}x ${dir} ${N(c-b)}`,`Delen door ${a} (negatief) → teken draait om`,`x ${eff} ${N(x)}`])};
+}
 function genInvullen(l){
   const T1=[
     ()=>{const lv=rnd(R(25,90)/10,1),b=rnd(R(20,60)/10,1);const v=lv*b;return {f:'A = l · b',g:`l = ${N(lv)} m en b = ${N(b)} m`,v,u:'m²',st:[`A = ${N(lv)} × ${N(b)} = ${N(v,2)} m²`]}},
@@ -501,6 +508,14 @@ function genGemiddelde(l){
   const k=4,xs=Array.from({length:k-1},()=>R(55,95));const doel=R(70,85);const v=doel*k-xs.reduce((a,b)=>a+b,0);
   if(v<0||v>150)return genGemiddelde(l);
   return {q:`De druksterkte van ${k} betonkubussen moet gemiddeld <b>${doel} N/mm²</b> zijn. Drie kubussen geven ${xs.join(', ')} N/mm². Welke waarde moet de vierde kubus minimaal hebben?`,type:'num',answer:v,unit:'N/mm²',hint:'Het totaal moet gemiddelde × aantal zijn. Trek daar de bekende waarden van af.',sol:steps([`Benodigd totaal: ${doel} × ${k} = ${doel*k}`,`Al bekend: ${xs.join(' + ')} = ${xs.reduce((a,b)=>a+b,0)}`,`Vierde kubus: ${doel*k} − ${xs.reduce((a,b)=>a+b,0)} = ${v} N/mm²`])};
+}
+function genVerhouding(l){
+  if(l===1){const a=R(1,6),b=R(1,6),tot=(a+b)*R(4,40);const deel1=tot*a/(a+b);
+    return {q:`Twee aannemers verdelen een opdracht van <b>${N(tot)} uur</b> in de verhouding <b>${a} : ${b}</b>. Hoeveel uur krijgt de eerste aannemer?`,type:'num',answer:deel1,unit:'uur',hint:'Deel het totaal door (a + b) en vermenigvuldig met a.',sol:steps([`${N(tot)} ÷ (${a} + ${b}) = ${N(tot/(a+b),2)} per deel`,`Eerste deel: ${a} × ${N(tot/(a+b),2)} = ${N(deel1,2)} uur`]),calc:false}}
+  if(l===2){const a=R(2,7),b=R(2,7),k=rnd(R(10,200)/10,1);const bekend=clean(k*a),zand=clean(k*b);
+    return {q:`Cement en zand worden gemengd in de verhouding <b>${a} : ${b}</b>. Je gebruikt <b>${N(bekend,1)} kg</b> cement. Hoeveel kg zand heb je nodig? (1 decimaal)`,type:'num',answer:zand,dec:1,unit:'kg',hint:'Deel door het cement-deel, vermenigvuldig met het zand-deel.',sol:steps([`${N(bekend,1)} ÷ ${a} = ${N(k,2)} per deel`,`${N(k,2)} × ${b} = ${N(zand,2)} kg zand`])}}
+  const a=R(2,5),b=R(2,5),c=R(2,5),tot=(a+b+c)*R(5,25);
+  return {q:`Een bedrag van <b>€ ${N(tot)}</b> wordt verdeeld over drie vennoten in de verhouding <b>${a} : ${b} : ${c}</b>. Hoeveel krijgt de derde vennoot? (2 decimalen)`,type:'num',answer:tot*c/(a+b+c),dec:2,unit:'€',unitPre:true,hint:'Deel het totaal door (a + b + c) en vermenigvuldig met c.',sol:steps([`€ ${N(tot)} ÷ (${a}+${b}+${c}) = € ${N(tot/(a+b+c),2)} per deel`,`Derde vennoot: ${c} × € ${N(tot/(a+b+c),2)} = € ${N(tot*c/(a+b+c),2)}`])};
 }
 // W-03 eenheden: tijd, snelheid, debiet
 function genTijd(l){

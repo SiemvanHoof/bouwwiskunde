@@ -85,6 +85,14 @@ function genDauw(l){
   return {q:`Binnenlucht is <b>${T} °C</b> met <b>${rv}%</b> RV. Bepaal het dauwpunt door te interpoleren in de tabel. Rond af op 1 decimaal.${psatTable()}`,type:'num',answer:d,dec:1,unit:'°C',hint:'Bereken p_w = RV × p_sat(T). Zoek tussen welke twee tabelwaarden p_w ligt en interpoleer lineair.',sol:steps([`p_w = ${N(rv/100)} × ${ps} = ${N(pw,1)} Pa`,`Ligt tussen ${PSAT.filter(r=>r[1]<=pw).slice(-1)[0].join(' °C: ')} Pa en ${PSAT.find(r=>r[1]>pw).join(' °C: ')} Pa`,`Dauwpunt ≈ ${N(d,2)} °C`,'Oppervlakken kouder dan het dauwpunt worden nat.'])};
 }
 
+function genGeluidwering(l){
+  if(l===1){const Lz=R(70,95),Rw=pick([42,47,52,57,62]);const Lo=Lz-Rw;
+    return {q:`In de naburige ruimte is het geluidsniveau <b>${Lz} dB</b>. De scheidingswand heeft een geluidsisolatie (R<sub>w</sub>) van <b>${Rw} dB</b>. Welk niveau komt er ongeveer door in de ontvangende ruimte?`,type:'num',answer:Lo,unit:'dB',hint:'Ontvangen niveau ≈ zendend niveau − R_w van de wand.',sol:steps([`${Lz} − ${Rw} = ${Lo} dB`]),calc:false}}
+  if(l===2){const Lz=R(75,95),eis=pick([30,35,40]);const RwMin=Lz-eis;
+    return {q:`Het bronniveau in de buurwoning is <b>${Lz} dB</b>. De eis is dat er niet meer dan <b>${eis} dB</b> doorkomt. Welke geluidsisolatie (R<sub>w</sub>) moet de scheidingswand minimaal hebben?`,type:'num',answer:RwMin,unit:'dB',hint:'R_w ≥ zendend niveau − toegestaan niveau.',sol:steps([`R_w ≥ ${Lz} − ${eis} = ${RwMin} dB`])}}
+  const Lz=R(80,95),Rw=pick([42,47,52]),extra=pick([3,5,8,10]);const Lo=Lz-Rw-extra;
+  return {q:`Een scheidingswand heeft R<sub>w</sub> = <b>${Rw} dB</b>. Je monteert er een voorzetwand voor die (vereenvoudigd) <b>${extra} dB</b> extra isolatie geeft. Het bronniveau is <b>${Lz} dB</b>. Welk niveau komt er nu ongeveer door?`,type:'num',answer:Lo,unit:'dB',hint:'Tel de extra isolatie bij de R_w van de wand op en trek het totaal van het bronniveau af.',sol:steps([`R_w totaal ≈ ${Rw} + ${extra} = ${Rw+extra} dB`,`${Lz} − ${Rw+extra} = ${Lo} dB`,'Vereenvoudigd rekenmodel: in werkelijkheid telt een voorzetwand niet altijd zomaar bij de R_w op.'])};
+}
 // ---- Bouweconomie ----
 function genKostprijs(l){
   if(l===1){const A=R(80,250),K=A*pick([1450,1650,1850,2100,2400]);return {q:`De bouwkosten van een woning met <b>${A} m²</b> bruto vloeroppervlak (BVO) zijn <b>€ ${N(K)}</b>. Wat is de prijs per m² BVO?`,type:'num',answer:K/A,dec:2,unit:'€/m²',hint:'Prijs per m² = totale kosten ÷ oppervlak',sol:steps([`€ ${N(K)} ÷ ${A} = € ${N(K/A,2)} per m²`])}}
